@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "./parser.cpp"
+#include "EXE.cpp"
 
 using namespace std;
 
@@ -10,17 +10,25 @@ class core{
     int registers[32]={0};
     int programCounter =0;
     vector<string> Program;
-    void executeLine(int memory[])
+    void Print()
     {
-        if(programCounter>= Program.size())
+        for(int i=0;i<32;i++)
         {
-            return;
+            cout<<registers[i]<<" ";
         }
-        else
-        {
-            
-            programCounter = parse(Program[programCounter],registers,memory,programCounter);
-        }
+        cout<<endl;
     }
+    int executeLine(int memory[])
+    {
+        //cout<<programCounter<<Program.size()<<endl;
+        if(programCounter>=Program.size()) return 0;
+        //cout<<"JU"<<endl;
+        vector <Token> LineTokens = Tokenizer(Program[programCounter],programCounter);
+        //cout<<"JU1"<<LineTokens.size()<<endl;
+        EXE executer;
+        executer.execute(LineTokens,registers,programCounter);
+        return 1;
+    }
+    
 
 };

@@ -34,10 +34,13 @@ int main(int argc, char* argv[])
         vector<string> Program;
         while (std::getline(inputFile, line)) {
             Program.push_back(line);
+            //cout<<line<<" "<<i<<endl;
         }
         Processor.cores[i].Program = Program;
     }
     Processor.run();
+    Processor.cores[0].Print();
+    Processor.cores[1].Print();
 
 
 
