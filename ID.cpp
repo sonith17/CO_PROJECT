@@ -19,13 +19,42 @@ vector<Token> Tokenizer(string line,int pc)
     for(int i =0;i<line.length();i++)
     {
         //cout<<s<<" jj "<<endl;
-        if(line[i]!= ' '&& line[i]!= ',')
+        if(line[i]!= ' ' && line[i]!= ',' && !(line[i]==':') && line[i]!='(' && line[i]!=')')
         {
             s=s+line[i];
         }
+        else if(line[i]==':')
+        {
+            s=s+line[i];
+            //cout<<s<<"  jh " <<endl;
+           if(s!="")
+            {
+                tokens.push_back(tokenize(s,pc));
+            }
+            s="";
+        }
+        else if(line[i]=='(')
+        {
+            //cout<<s<<" "<<i<<" b ------------------------------------------------------------------------------------------------------------------------"<<endl;
+            if(s!="")
+            {
+                tokens.push_back(tokenize(s,pc));
+            }
+            s="";
+            //cout<<"ki  "<<endl;
+            
+        }
+        else if(line[i]==')')
+        {
+
+        }
         else
         {
-            tokens.push_back(tokenize(s,pc));
+            //cout<<s<<"  jh " <<endl;
+            if(s!="")
+            {
+                tokens.push_back(tokenize(s,pc));
+            }
             s="";
         }
     }

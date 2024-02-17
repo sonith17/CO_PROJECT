@@ -2,6 +2,7 @@
 #include<string>
 #include<vector>
 #include <map>
+#include <unordered_map>
 #include "Token.hpp"
 #include "ID.cpp"
 using namespace std;
@@ -12,7 +13,7 @@ private:
     map<string,int> Register;
 public:
     EXE();
-    void execute(vector<Token> tokens, int registers[], int &pc);
+    int  execute(vector<Token> tokens, int registers[], int &pc,unordered_map<string, int > &labels);
 };
 
 EXE::EXE()
@@ -24,7 +25,7 @@ EXE::EXE()
     }
 }
 
-void EXE:: execute(vector<Token> tokens, int registers[], int &pc)
+int EXE:: execute(vector<Token> tokens, int registers[], int &pc,unordered_map<string, int > &labels)
 {
     // cout<<Register["x6"]<<endl;
     // cout<<tokens.size()<<endl;
@@ -53,6 +54,45 @@ void EXE:: execute(vector<Token> tokens, int registers[], int &pc)
         registers[Register[destination.Name]]= registers[Register[sourc1.Name]]+stoi(immediate.Name);
         pc+=1;
     }
+    else if(tokens[0].Name[tokens[0].Name.length()-1]==':' && tokens.size()==1)
+    {
+        labels.insert({tokens[0].Name.substr(0,tokens[0].Name.length()-1),pc+1});
+        pc+=1;
+    }
+    else if(tokens[0].Name=="bne")
+    {
+        Token sourc1 = tokens[1];
+        Token sourc2 = tokens[2];
+        Token destination = tokens[3];
+        if(registers[Register[sourc1.Name]]!=registers[Register[sourc2.Name]])
+        {
+            pc = labels[destination.Name];
+        }
+        else
+        {
+            pc+=1;
+        }
+    }
+    else if(tokens[0].Name=="sw")
+    {
+        Token sourc1 = tokens[1];
+        Token immediate = tokens[2];
+        Token destination = tokens[3];
+        pc+=1;
+        return stoi(immediate.Name)+registers[Register[sourc1.Name]];
+        
+    }
+    else if(tokens[0].Name=="lw")
+    {
+        Token destination = tokens[1];
+        Token immediate = tokens[2];
+        Token sourc1 = tokens[3];
+        pc+=1;
+        cout<< "result id "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<<endl;
+        return stoi(immediate.Name)+registers[Register[sourc1.Name]];
+        
+    }
+    return -1;
     //cout<<"Execution com"<<endl;
 }
 

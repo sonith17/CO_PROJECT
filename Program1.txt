@@ -1,3 +1,10 @@
 addi x1,x2,4 
 sub x3,x1,x5
 sub x1,x4,x5
+label:
+addi x1,x1,1
+addi x31,x31,1
+bne x1,x3,label
+sw x1,8(x31)
+addi x31,x31 9
+lw x2 0(x31)

@@ -8,7 +8,7 @@ using namespace std;
 class processor{
     public:
     int clock;
-    core cores[2] = {core(),core()};
+    Core cores[2] = {Core(),Core()};
     int memory[4096] = {0};
     void run()
     {

@@ -13,6 +13,10 @@ struct Token{
         this->line = line;
         this->Name = Name;
     }
+    Token()
+    {
+        
+    }
 
 };
 
