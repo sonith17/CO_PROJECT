@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
             Program.push_back(line);
             //cout<<line<<" "<<i<<endl;
         }
+
         Processor.cores[i].Program = Program;
     }
     cout<<Processor.memory[12]<<endl;

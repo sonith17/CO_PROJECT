@@ -12,6 +12,8 @@ class processor{
     int memory[4096] = {0};
     void run()
     {
+        cores[0].getLabels();
+        cores[1].getLabels();
         //cout<<cores[0].Program.size() <<"  JJJ  "<<clock << cores[1].Program.size()<<endl;
         int t =1,t1=1;
         while(t1|t!=0)

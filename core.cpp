@@ -11,7 +11,12 @@ class Core{
     int registers[32]={0};
     int programCounter =0;
     vector<string> Program;
-    unordered_map<string, int > labels;
+    unordered_map<string, int> labels;
+
+    void getLabels()
+    {
+        labels = get_labels(Program);
+    }
 
 
     void Print()
