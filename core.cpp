@@ -40,7 +40,7 @@ class Core{
             cout<<x.Name<<endl;
         }
         EXE executer;
-        //programCounter++;
+        // //programCounter++;
         int address = executer.execute(LineTokens,registers,programCounter,labels);
         if(address != -1)
         {

@@ -22,10 +22,11 @@ void LabelTokenizer(unordered_map <string,int>& labels,string line,int lineNumbe
         if(c==':')
         {
             cout<<"label  --"<<s<<endl;
+
             labels[s]=lineNumber;
             return;
         }
-        s=s+c;
+        if(c!=' ')s=s+c;
     }
 }
 

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "Token.hpp"
 #include "ID.cpp"
+#include <unistd.h>
 using namespace std;
 
 class EXE
@@ -244,6 +245,8 @@ int EXE:: execute(vector<Token> tokens, int registers[], int &pc,unordered_map<s
     {
         Token destination = tokens[1];
         pc = labels[destination.Name];
+        cout<<pc<<" This is program counter "<<endl;
+        //sleep(20);
     }
     else if(tokens[0].Name=="jal")
     {

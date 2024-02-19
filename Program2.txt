@@ -1,2 +1,19 @@
-addi x11,x12,-8
-sub x10,x12,x15
+addi x10 x0 71
+addi x31 x0 1
+addi x29 x0 0
+while:
+    addi x1 x0 234
+    beq x31 x0 exit
+    addi x1 x0 235
+    and x30 x31 x10
+    beq x31 x30 inc
+    addi x1 x0 236
+    slli x31 x31 1
+    j while
+    inc:
+        addi x29 x29 1
+        slli x31 x31 1
+        j while
+exit:
+    addi x28 x29 -32
+    sub x28 x0 x28
