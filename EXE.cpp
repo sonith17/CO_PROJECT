@@ -14,7 +14,7 @@ private:
     map<string,int> Register;
 public:
     EXE();
-    int  execute(vector<Token> tokens, int registers[], int &pc,unordered_map<string, int > &labels);
+    int  execute(vector<Token> tokens, int registers[], int &pc,map<string, int > &labels,map<string,DataToken>& dataLabels);
 };
 
 EXE::EXE()
@@ -26,7 +26,7 @@ EXE::EXE()
     }
 }
 
-int EXE:: execute(vector<Token> tokens, int registers[], int &pc,unordered_map<string, int > &labels)
+int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int > &labels,map<string,DataToken>& dataLabels)
 {
     // cout<<Register["x6"]<<endl;
     // cout<<tokens.size()<<endl;
@@ -224,28 +224,38 @@ int EXE:: execute(vector<Token> tokens, int registers[], int &pc,unordered_map<s
     }
     else if(tokens[0].Name=="sw")
     {
-        Token sourc1 = tokens[1];
+        Token sourc1 = tokens[3];
         Token immediate = tokens[2];
-        Token destination = tokens[3];
+        Token destination = tokens[1];
         pc+=1;
+        //cout<< "add is sw "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<< endl;;
         return stoi(immediate.Name)+registers[Register[sourc1.Name]];
         
     }
-    else if(tokens[0].Name=="lw")
+    else if(tokens[0].Name=="lw" && tokens.size()==4)
     {
         Token destination = tokens[1];
         Token immediate = tokens[2];
         Token sourc1 = tokens[3];
         pc+=1;
-        cout<< "result id "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<<endl;
+        //cout<< "result id "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<<endl;
         return stoi(immediate.Name)+registers[Register[sourc1.Name]];
+        
+    }
+    else if(tokens[0].Name=="lw" && tokens.size()==3)
+    {
+        Token destination = tokens[1];
+        Token label = tokens[2];
+        pc+=1;
+       // cout<<label.Name<<"------------------------------------------------------------------------------------------------------------"<<dataLabels[label.Name].address<<endl;
+        return dataLabels[label.Name].address;
         
     }
     else if(tokens[0].Name=="j")
     {
         Token destination = tokens[1];
         pc = labels[destination.Name];
-        cout<<pc<<" This is program counter "<<endl;
+       // cout<<pc<<" This is program counter "<<endl;
         //sleep(20);
     }
     else if(tokens[0].Name=="jal")

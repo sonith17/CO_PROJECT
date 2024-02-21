@@ -39,12 +39,13 @@ int main(int argc, char* argv[])
 
         Processor.cores[i].Program = Program;
     }
-    cout<<Processor.memory[12]<<endl;
-    Processor.memory[13]=67;
+    cout<<Processor.memory1[12]<<endl;
+    Processor.memory1[13]=67;
     Processor.run();
     Processor.cores[0].Print();
     Processor.cores[1].Print();
-    cout<<Processor.memory[12]<<endl;
+    cout<<Processor.memory1[12]<<endl;
+    Processor.print();
 
 
 
