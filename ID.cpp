@@ -17,12 +17,24 @@ vector<string> tokenizeDataLine(string DataLine)
 {
     vector<string> tokens;
     string s ="";
+    bool str = false;
     for(int i =0;i<DataLine.length();i++)
     {
-        if(DataLine[i]!=' ')
+        // cout<< " s is "<<s<<"!---!"<<DataLine[i]<<"str is"<<str<<endl;
+        if(DataLine[i]!=' '&& !str && DataLine[i]!='"')
         {
              //cout<<s<<"qwert !"<<DataLine[i]<<"!asdf"<<endl;
             s=s+DataLine[i];
+        }
+        else if(str)
+        {
+            s=s+DataLine[i];
+        }
+        else if(DataLine[i]=='"')
+        {
+            str = true;
+            s=s+DataLine[i];
+            
         }
         else
         {
@@ -34,7 +46,6 @@ vector<string> tokenizeDataLine(string DataLine)
     }
     if(s!="")
     {
-        //cout<<s<<endl;
         tokens.push_back(s);
         s="";
     }
@@ -69,7 +80,7 @@ void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels
     {
         if(tokens.at(0)==".string")
         {
-            for(int i=1;i<tokens.at(1).length()-1;i++)
+            for(int i=1;i<tokens.at(1).length()-2;i++)
             {
                 memory[address]= (int)tokens.at(1)[i];
                 address++;
@@ -93,7 +104,7 @@ void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels
         if(tokens.at(0)==".string")
         { 
             int preAddress = address; 
-            for(int i=1;i<tokens.at(1).length()-1;i++)
+            for(int i=1;i<tokens.at(1).length()-2;i++)
             {
                 memory[address]= (int)tokens.at(1)[i];
                 address++;

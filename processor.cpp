@@ -37,7 +37,7 @@ class processor{
     }
     void print()
     {
-        for(int i =256;i<345;i++)
+        for(int i =256;i<400;i++)
         {
             cout<<(int)memory1[i]<<" ";
         }
