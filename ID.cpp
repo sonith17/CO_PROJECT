@@ -200,9 +200,13 @@ vector<Token> Tokenizer(string line,int pc)
     string s;
     for(int i =0;i<line.length();i++)
     {
-        if(line[i]!= ' ' && line[i]!= ',' && !(line[i]==':') && line[i]!='(' && line[i]!=')')
+        if(line[i]!= ' ' && line[i]!= ',' && !(line[i]==':') && line[i]!='(' && line[i]!=')' && line[i]!='#')
         {
             s=s+line[i];
+        }
+        else if(line[i]=='#')
+        {
+            return tokens;
         }
         else if(line[i]==':')
         {

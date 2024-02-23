@@ -54,6 +54,11 @@ class Core{
     {
         if(programCounter>=Program.size()) return 0;
         vector <Token> LineTokens = Tokenizer(Program[programCounter],programCounter);
+        if(LineTokens.size()==0)
+        {
+            programCounter++;
+            return 1;
+        }
         EXE executer;
         int address = executer.execute(LineTokens,registers,programCounter,labels,dataLabels);
         if(address != -1)
