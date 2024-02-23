@@ -28,9 +28,6 @@ EXE::EXE()
 
 int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int > &labels,map<string,DataToken>& dataLabels)
 {
-    // cout<<Register["x6"]<<endl;
-    // cout<<tokens.size()<<endl;
-    // cout<<"Execution start"<<endl;
     if(tokens[0].Name=="add")
     {
         Token destination = tokens[1];
@@ -228,7 +225,6 @@ int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int
         Token immediate = tokens[2];
         Token destination = tokens[1];
         pc+=1;
-        //cout<< "add is sw "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<< endl;;
         return stoi(immediate.Name)+registers[Register[sourc1.Name]];
         
     }
@@ -238,7 +234,6 @@ int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int
         Token immediate = tokens[2];
         Token sourc1 = tokens[3];
         pc+=1;
-        //cout<< "result id "<<stoi(immediate.Name)+registers[Register[sourc1.Name]]<<endl;
         return stoi(immediate.Name)+registers[Register[sourc1.Name]];
         
     }
@@ -247,23 +242,18 @@ int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int
         Token destination = tokens[1];
         Token label = tokens[2];
         pc+=1;
-       // cout<<label.Name<<"------------------------------------------------------------------------------------------------------------"<<dataLabels[label.Name].address<<endl;
         return dataLabels[label.Name].address;
-        
     }
     else if(tokens[0].Name=="j")
     {
         Token destination = tokens[1];
         pc = labels[destination.Name];
-       // cout<<pc<<" This is program counter "<<endl;
-        //sleep(20);
     }
-    else if(tokens[0].Name=="jal")
-    {
-        Token destination = tokens[1];
-        pc = labels[destination.Name];
-    }
+    // else if(tokens[0].Name=="jal")
+    // {
+    //     Token destination = tokens[1];
+    //     pc = labels[destination.Name];
+    // }
     return -1;
-    //cout<<"Execution com"<<endl;
 }
 

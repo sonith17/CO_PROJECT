@@ -19,28 +19,40 @@ class processor{
         cores[1].getData(memory2);
         cores[0].getLabels();
         cores[1].getLabels();
-        //cout<<cores[0].Program.size() <<"  JJJ  "<<clock << cores[1].Program.size()<<endl;
-        int t =1,t1=1;
+        int t=1,t1=1;
         while(t1|t!=0)
         {
-            // cout<<cores[0].Program.size() <<"  JJJ  "<<clock << cores[1].Program.size()<<endl;
-            // cout<<"clock is "<<clock<<endl;
-
-                //cout<<"clock is1 "<<clock<<endl;
-                t=cores[0].executeLine(memory1);
-                t1=cores[1].executeLine(memory2);
-                //cout<<"clock is2 "<<clock<<endl;
-                
-            
+            t=cores[0].executeLine(memory1);
+            t1=cores[1].executeLine(memory2);
             clock++;
         }
     }
-    void print()
+    void printMemory()
     {
-        for(int i =256;i<400;i++)
+        int count = 0;
+        cout << "First 2048 bytes" << endl;
+        cout << "------------------------------------------------------------------------------------------------------"<<endl;
+        for(int i = 0; i < 2048; i++)
         {
-            cout<<(int)memory1[i]<<" ";
+            cout << "|" << (int)memory1[i] << " ";
+            count++;
+            if((i+1) % 32 == 0)
+            {
+                cout << "|" << endl;
+            }
         }
-        cout<<endl;
+        cout << "------------------------------------------------------------------------------------------------------" <<endl;
+        cout << "Second 2048 bytes" << endl;
+        cout << "------------------------------------------------------------------------------------------------------"<<endl;
+        for(int i = 0; i < 2048; i++)
+        {
+            cout << "|" << (int)memory2[i] << " ";
+            count++;
+            if((i+1) % 32 == 0)
+            {
+                cout << "|" << endl;
+            }
+        }
+        cout << "------------------------------------------------------------------------------------------------------" <<endl;
     }
 };

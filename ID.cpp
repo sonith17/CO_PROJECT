@@ -1,8 +1,9 @@
 #include <iostream>
-#include<sstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
+#include <stdint.h>
 #include "Token.hpp"
 using namespace std;
 
@@ -20,10 +21,12 @@ vector<string> tokenizeDataLine(string DataLine)
     bool str = false;
     for(int i =0;i<DataLine.length();i++)
     {
-        // cout<< " s is "<<s<<"!---!"<<DataLine[i]<<"str is"<<str<<endl;
+        if(DataLine[i] == '#')
+        {
+            return tokens;
+        }
         if(DataLine[i]!=' '&& !str && DataLine[i]!='"')
         {
-             //cout<<s<<"qwert !"<<DataLine[i]<<"!asdf"<<endl;
             s=s+DataLine[i];
         }
         else if(str)
@@ -65,8 +68,6 @@ void storeAsHex(int8_t memory[],string value,int address)
     {
         memory[address+i] = *(po+i);
     }
-
-
 }
 
 
@@ -75,6 +76,10 @@ void storeAsHex(int8_t memory[],string value,int address)
 void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels,int &address)
 {
     vector<string> tokens  = tokenizeDataLine(DataLine);
+    if(tokens.size() == 0)
+    {
+        return;
+    }
     int size = tokens.size();
     if(tokens.at(0)==".string"|| tokens.at(0)==".word")
     {
@@ -120,9 +125,8 @@ void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels
                 storeAsHex(memory,tokens.at(i),address);
                 address+=4;
             }
-            DataToken dataLabel(preAddress,4,label,"word");
+            DataToken dataLabel(preAddress,address-preAddress,label,"word");
             dataLabels[label]=dataLabel;
-            //cout<<" da ta ---------------------------------------------------------------------------------------l "<<dataLabel.address<<endl;
         }
     }
 }
@@ -173,9 +177,7 @@ void LabelTokenizer(map <string,int>& labels,string line,int lineNumber)
     {
         if(c==':')
         {
-            cout<<"label  --"<<s<<endl;
-
-            labels[s]=lineNumber;
+            labels[s]=lineNumber; // labels of the whole program has been stored here.
             return;
         }
         if(c!=' ')s=s+c;
@@ -194,12 +196,10 @@ map<string,int> get_labels(vector<string> Program)
 
 vector<Token> Tokenizer(string line,int pc)
 {
-    //cout<<"line is"<<line<<endl;
     vector<Token> tokens;
     string s;
     for(int i =0;i<line.length();i++)
     {
-        //cout<<s<<" jj "<<endl;
         if(line[i]!= ' ' && line[i]!= ',' && !(line[i]==':') && line[i]!='(' && line[i]!=')')
         {
             s=s+line[i];
@@ -207,7 +207,6 @@ vector<Token> Tokenizer(string line,int pc)
         else if(line[i]==':')
         {
             s=s+line[i];
-            //cout<<s<<"  jh " <<endl;
            if(s!="")
             {
                 tokens.push_back(tokenize(s,pc));
@@ -216,14 +215,11 @@ vector<Token> Tokenizer(string line,int pc)
         }
         else if(line[i]=='(')
         {
-            //cout<<s<<" "<<i<<" b ------------------------------------------------------------------------------------------------------------------------"<<endl;
             if(s!="")
             {
                 tokens.push_back(tokenize(s,pc));
             }
             s="";
-            //cout<<"ki  "<<endl;
-            
         }
         else if(line[i]==')')
         {
@@ -231,7 +227,6 @@ vector<Token> Tokenizer(string line,int pc)
         }
         else
         {
-            //cout<<s<<"  jh " <<endl;
             if(s!="")
             {
                 tokens.push_back(tokenize(s,pc));
@@ -243,7 +238,6 @@ vector<Token> Tokenizer(string line,int pc)
     {
         tokens.push_back(tokenize(s,pc));
     }
-    //cout<<"jijrf "<<tokens.size()<<endl;
     return tokens;
 }
 

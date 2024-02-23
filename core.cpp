@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdint.h>
 #include "EXE.cpp"
 
 using namespace std;
@@ -38,29 +39,22 @@ class Core{
         
     }
 
-    void Print()
+    void printRegisters()
     {
+        cout << "------------------------------------------------------------------------------------------------------" << endl;
         for(int i=0;i<32;i++)
         {
-            cout<<registers[i]<<" ";
+            cout<< "|" << registers[i]<<" ";
         }
+        cout << "|";
         cout<<endl;
+        cout << "------------------------------------------------------------------------------------------------------" << endl;
     }
     int executeLine(int8_t memory[])
     {
-        //cout<<" Pc ic "<<programCounter<<endl;
         if(programCounter>=Program.size()) return 0;
-        //cout<<"JU"<<endl;
-
         vector <Token> LineTokens = Tokenizer(Program[programCounter],programCounter);
-        //cout<<LineTokens.size()<<" df "<<endl;
-
-        // for(auto x:LineTokens)
-        // {
-        //     cout<<x.Name<<endl;
-        // }
         EXE executer;
-        // //programCounter++;
         int address = executer.execute(LineTokens,registers,programCounter,labels,dataLabels);
         if(address != -1)
         {
@@ -68,7 +62,6 @@ class Core{
             {
                 uint8_t *po;
                 po = (uint8_t*)&registers[stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))];
-                //cout<< " value to be stored "<<registers[stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))]<<" at "<<address<<endl;
                 for(int i =0;i<4;i++)
                 {
                     memory[address+i] = *(po+i);
@@ -76,14 +69,28 @@ class Core{
             }
             else if(LineTokens[0].Name=="lw")
             {
-                //cout<< " value to be sored "<<address<<endl;
                 int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
                 registers[stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))] = value;
             }
         }
-        // programCounter++;
         return 1;
     }
     
+    void printDataLabels()
+    {
+        map<string, DataToken>::iterator it = dataLabels.begin();
+        while (it != dataLabels.end()) {
+            cout << "Key: " << it->first << ", address: " << it->second.address << ", size: " << it->second.size << ", varName: " << it->second.varName << ", type: " << it->second.type << endl;
+            ++it;
+        }
+    }
 
+    void printLabels(){
+        map<string, int>::iterator it = labels.begin();
+        while(it != labels.end())
+        {
+            cout << "Key: " << it -> first << ", Value: " << it -> second << endl;
+            ++it;
+        }
+    }
 };

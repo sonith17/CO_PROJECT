@@ -1,19 +1,75 @@
-addi x10 x0 71
-addi x31 x0 1
-addi x29 x0 0
-while:
-    addi x1 x0 234
-    beq x31 x0 exit
-    addi x1 x0 235
-    and x30 x31 x10
-    beq x31 x30 inc
-    addi x1 x0 236
-    slli x31 x31 1
-    j while
-    inc:
-        addi x29 x29 1
-        slli x31 x31 1
-        j while
-exit:
-    addi x28 x29 -32
-    sub x28 x0 x28
+.data
+.word 3, 2, 1
+base: .word 0x00000100
+.text
+#load address: x1
+lw x1 base
+#size: x2
+addi x2 x0 0
+addi x2 x2 3
+selection_sort:
+    #i: x3
+    addi x3 x0 0
+    #j: x4
+    addi x4 x0 0
+    #min_index: x5
+    addi x5 x0 0
+    for_loop_1:
+        #n-1: x6
+        addi x6 x2 -1
+        #loop condition
+        bge x3 x6 end_loop_1
+        #initialization of min_index with the lowest index
+        add x5 x0 x3
+        #initialization of j
+        addi x4 x3 1
+        for_loop_2:
+            bge x4 x2 end_loop_2
+            #j * 4: x7
+            slli x7 x4 2
+            #change address: x8
+            add x8 x1 x7
+            #load word from the address: x9
+            lw x9 0(x8) #arr[j]
+            #min_index * 4: x10
+            slli x10 x5 2
+            #change address: x11
+            add x11 x1 x10
+            #load word from the address: x12
+            lw x12 0(x11) #arr[min_index]
+            if_1:
+                bge x9 x12 end_if_1
+                add x5 x0 x4
+                #increment j
+                addi x4 x4 1
+                j for_loop_2
+        if_2:
+            beq x5 x3 end_if_2
+            #j * 4: x7
+            slli x7 x3 2
+            #change address: x8
+            add x8 x1 x7
+            #load word from the address: x9
+            lw x9 0(x8) #arr[j]
+            #min_index * 4: x10
+            slli x10 x5 2
+            #change address: x11
+            add x11 x1 x10
+            #load word from the address: x12
+            lw x12 0(x11) #arr[min_index]
+            #swap: 2 lines
+            sw x9 0(x11)
+            sw x12 0(x8)
+            #increment i
+            addi x3 x3 1
+            j for_loop_1
+end_if_2:
+    addi x3 x3 1
+    j for_loop_1
+end_if_1:
+    addi x4 x4 1
+    j for_loop_2
+end_loop_2:
+    j if_2
+end_loop_1:
+    
