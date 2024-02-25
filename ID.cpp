@@ -5,19 +5,19 @@
 #include <map>
 #include <stdint.h>
 #include "Token.hpp"
-using namespace std;
 
 
-Token tokenize(string Name,int line)
+
+Token tokenize(std::string Name,int line)
 {
      Token tr(line,Name);
      return tr;
 }
 
-vector<string> tokenizeDataLine(string DataLine)
+std::vector<std::string> tokenizeDataLine(std::string DataLine)
 {
-    vector<string> tokens;
-    string s ="";
+    std::vector<std::string> tokens;
+    std::string s ="";
     bool str = false;
     for(int i =0;i<DataLine.length();i++)
     {
@@ -55,11 +55,11 @@ vector<string> tokenizeDataLine(string DataLine)
     return tokens;
 }
 
-void storeAsHex(int8_t memory[],string value,int address)
+void storeAsHex(int8_t memory[],std::string value,int address)
 {
     int length  = value.length();
     unsigned int hexa;
-    stringstream ss;
+    std::stringstream ss;
     ss << std::hex << value;
     ss >> hexa;
     uint8_t *po;
@@ -73,9 +73,9 @@ void storeAsHex(int8_t memory[],string value,int address)
 
 
 
-void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels,int &address)
+void storeData(int8_t memory[],std::string DataLine,std::map<std::string,DataToken> &dataLabels,int &address)
 {
-    vector<string> tokens  = tokenizeDataLine(DataLine);
+    std::vector<std::string> tokens  = tokenizeDataLine(DataLine);
     if(tokens.size() == 0)
     {
         return;
@@ -102,7 +102,7 @@ void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels
     }
     else
     {
-        string label = tokens.at(0).substr(0,tokens.at(0).length()-1);
+        std::string label = tokens.at(0).substr(0,tokens.at(0).length()-1);
         
         tokens.erase(tokens.begin());
         size--;
@@ -132,9 +132,9 @@ void storeData(int8_t memory[],string DataLine,map<string,DataToken> &dataLabels
 }
 
 
-bool isData(string ProgramLine)
+bool isData(std::string ProgramLine)
 {
-    string s ="";
+    std::string s ="";
     for(int i=0;i<ProgramLine.length();i++)
     {
         if(ProgramLine[i]!=' ')
@@ -149,9 +149,9 @@ bool isData(string ProgramLine)
     return false;
 }
 
-bool isText(string ProgramLine)
+bool isText(std::string ProgramLine)
 {
-    string s ="";
+    std::string s ="";
     for(int i=0;i<ProgramLine.length();i++)
     {
         if(ProgramLine[i]!=' ')
@@ -170,9 +170,9 @@ bool isText(string ProgramLine)
 
 
 
-void LabelTokenizer(map <string,int>& labels,string line,int lineNumber)
+void LabelTokenizer(std::map <std::string,int>& labels,std::string line,int lineNumber)
 {
-    string s ="";
+    std::string s ="";
     for(char c : line)
     {
         if(c==':')
@@ -184,9 +184,9 @@ void LabelTokenizer(map <string,int>& labels,string line,int lineNumber)
     }
 }
 
-map<string,int> get_labels(vector<string> Program)
+std::map<std::string,int> get_labels(std::vector<std::string> Program)
 {
-    map <string,int> labels;
+    std::map <std::string,int> labels;
     for(int i=0;i<Program.size();i++)
     {
         LabelTokenizer(labels,Program.at(i),i);
@@ -194,10 +194,10 @@ map<string,int> get_labels(vector<string> Program)
     return labels;
 }
 
-vector<Token> Tokenizer(string line,int pc)
+std::vector<Token> Tokenizer(std::string line,int pc)
 {
-    vector<Token> tokens;
-    string s;
+    std::vector<Token> tokens;
+    std::string s;
     for(int i =0;i<line.length();i++)
     {
         if(line[i]!= ' ' && line[i]!= ',' && !(line[i]==':') && line[i]!='(' && line[i]!=')' && line[i]!='#')
@@ -244,4 +244,3 @@ vector<Token> Tokenizer(string line,int pc)
     }
     return tokens;
 }
-

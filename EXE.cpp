@@ -6,27 +6,26 @@
 #include "Token.hpp"
 #include "ID.cpp"
 #include <unistd.h>
-using namespace std;
 
 class EXE
 {
 private:
-    map<string,int> Register;
+    std::map<std::string,int> Register;
 public:
     EXE();
-    int  execute(vector<Token> tokens, int registers[], int &pc,map<string, int > &labels,map<string,DataToken>& dataLabels);
+    int  execute(std::vector<Token> tokens, int registers[], int &pc,std::map<std::string, int > &labels,std::map<std::string,DataToken>& dataLabels);
 };
 
 EXE::EXE()
 {
-    string x = "x";
+    std::string x = "x";
     for(int i = 0;i<32;i++)
     {
-        Register.insert({x+to_string(i),i});
+        Register.insert({x+std::to_string(i),i});
     }
 }
 
-int EXE:: execute(vector<Token> tokens, int registers[], int &pc,map<string, int > &labels,map<string,DataToken>& dataLabels)
+int EXE:: execute(std::vector<Token> tokens, int registers[], int &pc,std::map<std::string, int > &labels,std::map<std::string,DataToken>& dataLabels)
 {
     if(tokens[0].Name=="add")
     {

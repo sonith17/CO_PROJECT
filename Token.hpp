@@ -3,12 +3,11 @@
 #define TOKEN_H
 
 #include<string>
-using namespace std;
 
 struct Token{
     int line;
-    string Name;
-    Token(int line,string Name)
+    std::string Name;
+    Token(int line,std::string Name)
     {
         this->line = line;
         this->Name = Name;
@@ -24,10 +23,10 @@ struct Token{
 struct DataToken{
     int address;
     int size;
-    string varName;
-    string type;
+    std::string varName;
+    std::string type;
 
-    DataToken(int address,int size,string varname,string type)
+    DataToken(int address,int size,std::string varname,std::string type)
     {
         this->address=address;
         this->size=size;

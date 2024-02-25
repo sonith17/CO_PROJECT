@@ -5,13 +5,13 @@
 #include <filesystem>
 #include "./processor.cpp"
 
-using namespace std;
+
 using namespace std::filesystem;
 
 int main(int argc, char* argv[])
 {
     processor Processor;
-    vector<string> FilePaths;
+    std::vector<std::string> FilePaths;
     for(int i=1;i<argc;i++)
     {
         FilePaths.push_back(argv[i]);
@@ -19,19 +19,19 @@ int main(int argc, char* argv[])
     for(int i =0;i<2;i++)
     {
         path path = FilePaths[i]; 
-        if (!filesystem::exists(path)) {
-            cerr << "File not found." << endl;
+        if (!std::filesystem::exists(path)) {
+            std::cerr << "File not found." << std::endl;
             return 1; 
         }
 
-        ifstream inputFile(path);
+        std::ifstream inputFile(path);
         if (!inputFile.is_open()) {
-            cerr << "Unable to open the file." << endl;
+            std::cerr << "Unable to open the file." << std::endl;
             return 1; 
         }
 
-        string line;
-        vector<string> Program;
+        std::string line;
+        std::vector<std::string> Program;
         while (std::getline(inputFile, line)) {
             Program.push_back(line);
         }
@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
         Processor.cores[i].Program = Program;
     }
     Processor.run();
-    Processor.cores[0].printDataLabels();
-    Processor.cores[1].printDataLabels();
-    cout << "Register Contents: " << endl;
+    // Processor.cores[0].printDataLabels();
+    // Processor.cores[1].printDataLabels();
+    std::cout << "Register Contents: " << std::endl;
     Processor.cores[0].printRegisters();
     Processor.cores[1].printRegisters();
-    cout << "Memory Contents:" << endl;
+    std::cout << "Memory Contents:" << std::endl;
     Processor.printMemory();
 }
