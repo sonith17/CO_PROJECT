@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "instruction.hpp"
 #include <stdint.h>
 #include "EXE.cpp"
 
@@ -11,6 +12,14 @@ class Core{
     int registers[32]={0};
     int programCounter =0;
     std::vector<std::string> Program;
+    std::map<int,std::string> insType;
+    std::map<int,RType> rtype;
+    std::map<int,IType> itype;
+    std::map<int,SType> stype;
+    std::map<int,SBType> sbtype;
+    std::map<int,UType> utype;
+    std::map<int,UJType> ujtype;
+
     std::map<std::string, int> labels;
     std::map<std::string,DataToken> dataLabels;
 
