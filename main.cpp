@@ -5,6 +5,7 @@
 #include <filesystem>
 #include "./processor.cpp"
 
+// Make x0 hard wire to zero.
 
 using namespace std::filesystem;
 

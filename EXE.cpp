@@ -27,6 +27,7 @@ EXE::EXE()
 
 int EXE:: execute(std::vector<Token> tokens, int registers[], int &pc,std::map<std::string, int > &labels,std::map<std::string,DataToken>& dataLabels)
 {
+    std::cout << pc << std::endl;
     if(tokens[0].Name=="add")
     {
         Token destination = tokens[1];
@@ -245,13 +246,38 @@ int EXE:: execute(std::vector<Token> tokens, int registers[], int &pc,std::map<s
     }
     else if(tokens[0].Name=="j")
     {
+        std::cout << "YES2" << std::endl;
         Token destination = tokens[1];
         pc = labels[destination.Name];
     }
-    // else if(tokens[0].Name=="jal")
+    else if(tokens[0].Name=="jal")
+    {
+        std::cout << "YES1" << std::endl;
+        Token return_address = tokens[1];
+        Token destination = tokens[2];
+        pc = labels[destination.Name];
+        registers[Register[return_address.Name]] = pc+1; 
+    }
+    else if(tokens[0].Name=="jr")
+    {
+        std::cout << "YES" << std::endl;
+        Token destination = tokens[1];
+        pc = registers[Register[destination.Name]] - 1; 
+    }
+    else if(tokens[0].Name=="jalr")
+    {
+        Token destination = tokens[1];
+        Token sourc1 = tokens[2];
+        Token immediate = tokens[3];
+        registers[Register[destination.Name]] = pc+1;
+        pc = registers[Register[sourc1.Name]] + stoi(immediate.Name);
+    }
+    // else if(tokens[0].Name=="auipc")
     // {
     //     Token destination = tokens[1];
-    //     pc = labels[destination.Name];
+    //     Token immediate = tokens[2];
+    //     immediate.Name = immediate.Name + "000";
+    //     registers[Register[destination.Name]] = stoi(immediate.Name, 0, 16);
     // }
     return -1;
 }
