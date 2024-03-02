@@ -149,9 +149,9 @@ class Core{
          else if(instructType=="Stype")
         {
             result.push_back((stype[pc].opcode));
-            result.push_back(std::to_string(stype[pc].dest));
             result.push_back(std::to_string(stype[pc].src1));
             result.push_back(std::to_string(stype[pc].immed));
+            result.push_back(std::to_string(stype[pc].dest));
         }
          else if(instructType=="SBtype")
         {
@@ -174,21 +174,230 @@ class Core{
         }
         return result;
     }
-    std::pair<std::string, std::string> MEM(int8_t memory[],std::vector<std::string> exResult)
+
+    std::vector<std::string> Execute(int pc, std::vector<std::string> IDResults){
+        std::vector<std::string> exResults;
+        if(IDResults.at(0) == "add")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "sub")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] - registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "and")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "or")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "xor")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "sll")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "srl")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))])); // value
+        }
+        else if(IDResults.at(0) == "slt")
+        {
+            exResults.push_back(IDResults.at(0)); //opcode
+            exResults.push_back(IDResults.at(1)); //destination
+            if(registers[std::stoi(IDResults.at(2))] < registers[std::stoi(IDResults.at(3))])
+            {
+                exResults.push_back(std::to_string(1)); // value
+            }
+            else{
+                exResults.push_back(std::to_string(0)); // value
+            }
+        }
+        else if(IDResults.at(0) == "addi")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "andi")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "ori")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "xori")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "slli")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "srli")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "slti")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            if(registers[std::stoi(IDResults.at(2))] < std::stoi(IDResults.at(3)))
+            {
+                exResults.push_back("1");
+            }
+            else
+            {
+                exResults.push_back("0");
+            }
+        }
+        else if(IDResults.at(0) == "jalr")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(pc+1));
+
+            pc = registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
+            return exResults; 
+        }
+        else if(IDResults.at(0) == "lw")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
+        }
+        else if(IDResults.at(0) == "sw")
+        {
+            exResults.push_back(IDResults.at(0));  // opcode
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(3))] + std::stoi(IDResults.at(2)))); // destination
+            exResults.push_back((IDResults.at(1)));  // value
+        }
+        else if(IDResults.at(0) == "bne")
+        {
+            if(IDResults.at(1) != IDResults.at(2))
+            {
+                pc = labels[IDResults.at(3)];
+            }
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back("-1");
+            exResults.push_back("-1");
+        }
+        else if(IDResults.at(0) == "beq")
+        {
+            if(IDResults.at(1) == IDResults.at(2))
+            {
+                pc = labels[IDResults.at(3)];
+            }
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back("-1");
+            exResults.push_back("-1");
+            return exResults;
+        }
+        else if(IDResults.at(0) == "bge")
+        {
+            if(IDResults.at(1) >= IDResults.at(2))
+            {
+                pc = labels[IDResults.at(3)];
+            }
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back("-1");
+            exResults.push_back("-1");
+            return exResults;
+        }
+        else if(IDResults.at(0) == "blt")
+        {
+            if(IDResults.at(1) < IDResults.at(2))
+            {
+                pc = labels[IDResults.at(3)];
+            }
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back("-1");
+            exResults.push_back("-1");
+            return exResults;
+        }
+        else if(IDResults.at(0) == "auipc")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(IDResults.at(2));
+        }
+        else if(IDResults.at(0) == "jal")
+        {
+            exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(pc+1));
+            pc = std::stoi(IDResults.at(2));
+            return exResults;
+        }
+        pc++;
+        return exResults;
+    }
+
+
+    std::pair<std::string, std::string> MEM(int8_t memory[],std::vector<std::string> exResults)
     {
         std::pair<std::string, std::string> memResults;
-        if(exResult[0]=="lw")
+        if(exResults.at(0)=="lw")
         {
-            int address = registers[stoi(exResult.at(2))] + stoi(exResult.at(3));
+            int address = std::stoi(exResults.at(2));
             int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
-            memResults.first = exResult.at(1);
+            memResults.first = exResults.at(1);
             memResults.second = std::to_string(value);
         }
-        else if(exResult[0] == "sw")
+        else if(exResults.at(0) == "sw")
         {
+            uint8_t *po;
+            po = (uint8_t*)&registers[std::stoi(exResults.at(2))];
+            int address = registers[std::stoi(exResults.at(1))];
+            for(int i =0;i<4;i++)
+            {
+                memory[address+i] = *(po+i);
+            }
             memResults.first = "-1";
             memResults.second = "-1";
         }
-        // Values to be returned.
+        else if(exResults.at(1) != "-1" && exResults.at(2) != "-1")
+        {
+            memResults.first = exResults.at(1);
+            memResults.second = exResults.at(2);
+        }
+        return memResults;
+    }
+
+    void WriteBack(std::pair<std::string, std::string> memResults)
+    {
+        if(memResults.first != "-1" && memResults.second != "-1")
+        {
+            registers[std::stoi(memResults.first)] = std::stoi(memResults.second);
+        }
     }
 };

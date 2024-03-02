@@ -33,6 +33,9 @@ class RType : public instruction
     int src1;
     int src2;
     int dest;
+    RType(){
+        
+    }
     RType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int src1,int src2,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->src1 = src1;
@@ -47,6 +50,9 @@ class IType : public instruction
     int src1;
     int immed;
     int dest;
+    IType(){
+
+    }
     IType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int src1,int immed,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->src1 = src1;
@@ -61,6 +67,9 @@ class SType : public instruction
     int src1;
     int immed;
     int dest;
+    SType(){
+
+    }
     SType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int src1,int immed,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->src1 = src1;
@@ -75,6 +84,9 @@ class SBType :  public instruction
     int src1;
     int src2;
     std::string label;
+    SBType(){
+
+    }
     SBType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int src1,int src2,std::string label) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->src1 = src1;
@@ -88,6 +100,10 @@ class UType :  public instruction
     public:
     int immed;
     int dest;
+    UType()
+    {
+
+    }
     UType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int immed,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->immed = immed;
