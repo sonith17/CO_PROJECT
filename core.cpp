@@ -18,7 +18,7 @@ class Core{
     std::map<int,SType> stype;
     std::map<int,SBType> sbtype;
     std::map<int,UType> utype;
-    std::map<int,UJType> ujtype;
+    std::map<int,UJ1Type> ujtype;
 
     std::map<std::string, int> labels;
     std::map<std::string,DataToken> dataLabels;

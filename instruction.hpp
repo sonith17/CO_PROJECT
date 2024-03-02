@@ -20,7 +20,10 @@ class instruction
         this->MEM_t = MEM_t;
         this->WB_t = WB_t;
     }
-
+    instruction()
+    {
+        
+    }
 
 };
 
@@ -92,12 +95,16 @@ class UType :  public instruction
     }
 };
 
-class UJType :  public instruction
+class UJ1Type :  public instruction
 {
     public:
     int immed;
     int dest;
-    UJType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int immed,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
+    UJ1Type()
+    {
+
+    }
+    UJ1Type(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int immed,int dest) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
         this->immed = immed;
         this->dest = dest;

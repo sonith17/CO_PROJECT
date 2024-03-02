@@ -1,3 +1,7 @@
+#ifndef ID_H
+#define ID_H
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -28,6 +32,16 @@ std::vector<std::string> tokenizeDataLine(std::string DataLine)
         if(DataLine[i]!=' '&& !str && DataLine[i]!='"')
         {
             s=s+DataLine[i];
+        }
+        else if(str && DataLine[i]=='"')
+        {
+            s=s+DataLine[i];
+            if(s!=""){
+            tokens.push_back(s);
+            s="";
+            }
+            str = false;
+            
         }
         else if(str)
         {
@@ -85,7 +99,7 @@ void storeData(int8_t memory[],std::string DataLine,std::map<std::string,DataTok
     {
         if(tokens.at(0)==".string")
         {
-            for(int i=1;i<tokens.at(1).length()-2;i++)
+            for(int i=1;i<tokens.at(1).length()-1;i++)
             {
                 memory[address]= (int)tokens.at(1)[i];
                 address++;
@@ -109,7 +123,7 @@ void storeData(int8_t memory[],std::string DataLine,std::map<std::string,DataTok
         if(tokens.at(0)==".string")
         { 
             int preAddress = address; 
-            for(int i=1;i<tokens.at(1).length()-2;i++)
+            for(int i=1;i<tokens.at(1).length()-1;i++)
             {
                 memory[address]= (int)tokens.at(1)[i];
                 address++;
@@ -244,3 +258,6 @@ std::vector<Token> Tokenizer(std::string line,int pc)
     }
     return tokens;
 }
+
+
+#endif
