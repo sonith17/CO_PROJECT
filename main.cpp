@@ -7,6 +7,7 @@
 #include "./processor.cpp"
 #include "./parser.cpp"
 
+// Make x0 hard wire to zero.
 
 using namespace std::filesystem;
 

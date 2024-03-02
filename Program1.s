@@ -30,3 +30,12 @@ str1: .string " a" #hi
              j inner_loop                
 exit:
     addi x31 x16 0
+
+
+Label2:
+add x2 x0 x1
+jal x3 Label1
+addi x4 x4 5
+Label1:
+addi x1 x0 1
+jr x3
