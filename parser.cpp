@@ -183,8 +183,8 @@ class parser
                                    timeMap[line[0].Name][3],
                                    timeMap[line[0].Name][4],
                                    std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)),
-                                   std::stoi(line[2].Name));
-
+                                   -1);
+                jLabels.insert({i + offset, line[1].Name});
                 ujtype.insert({i + offset, instruction});
                 insType.insert({i + offset, "UJ1type"});
             }
