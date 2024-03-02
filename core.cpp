@@ -5,6 +5,7 @@
 #include "instruction.hpp"
 #include <stdint.h>
 #include "EXE.cpp"
+#include <utility>
 
 
 class Core{
@@ -83,6 +84,12 @@ class Core{
         return 1;
     }
 
+
+    void RunPipeline(int8_t memory[])
+    {
+
+    }
+
     void loadWord(int address, std::vector<Token> LineTokens, int8_t memory[])
     {
         int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
@@ -115,5 +122,73 @@ class Core{
             std::cout << "Key: " << it -> first << ", Value: " << it -> second << std::endl;
             ++it;
         }
+    }
+
+    std::string instructionFetch(int pc)
+    {
+        std::string instructType = insType[pc];
+        return instructType;
+    }
+    std::vector<std::string> instructionDecode(int pc , std::string instructType)
+    {
+        std::vector<std::string> result;
+        if(instructType =="Rtype")
+        {
+            result.push_back((rtype[pc].opcode));
+            result.push_back(std::to_string(rtype[pc].dest));
+            result.push_back(std::to_string(rtype[pc].src1));
+            result.push_back(std::to_string(rtype[pc].src2));
+        }
+        else if(instructType=="Itype")
+        {
+            result.push_back((itype[pc].opcode));
+            result.push_back(std::to_string(itype[pc].dest));
+            result.push_back(std::to_string(itype[pc].src1));
+            result.push_back(std::to_string(itype[pc].immed));
+        }
+         else if(instructType=="Stype")
+        {
+            result.push_back((stype[pc].opcode));
+            result.push_back(std::to_string(stype[pc].dest));
+            result.push_back(std::to_string(stype[pc].src1));
+            result.push_back(std::to_string(stype[pc].immed));
+        }
+         else if(instructType=="SBtype")
+        {
+            result.push_back((sbtype[pc].opcode));
+            result.push_back(std::to_string(sbtype[pc].src1));
+            result.push_back(std::to_string(sbtype[pc].src2));
+            result.push_back((sbtype[pc].label));
+        }
+        else if(instructType=="Utype")
+        {
+            result.push_back((utype[pc].opcode));
+            result.push_back(std::to_string(utype[pc].dest));
+            result.push_back(std::to_string(utype[pc].immed));
+        }
+        else if(instructType=="UJ1type")
+        {
+            result.push_back((ujtype[pc].opcode));
+            result.push_back(std::to_string(ujtype[pc].dest));
+            result.push_back(std::to_string(ujtype[pc].immed));
+        }
+        return result;
+    }
+    std::pair<std::string, std::string> MEM(int8_t memory[],std::vector<std::string> exResult)
+    {
+        std::pair<std::string, std::string> memResults;
+        if(exResult[0]=="lw")
+        {
+            int address = registers[stoi(exResult.at(2))] + stoi(exResult.at(3));
+            int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
+            memResults.first = exResult.at(1);
+            memResults.second = std::to_string(value);
+        }
+        else if(exResult[0] == "sw")
+        {
+            memResults.first = "-1";
+            memResults.second = "-1";
+        }
+        // Values to be returned.
     }
 };
