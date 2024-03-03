@@ -141,9 +141,9 @@ class parser
                                   timeMap[line[0].Name][2],
                                   timeMap[line[0].Name][3],
                                   timeMap[line[0].Name][4],
-                                  std::stoi(line[3].Name.substr(1, line[3].Name.length() - 1)),
+                                  std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)),
                                   std::stoi(line[2].Name),
-                                  std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)));
+                                  std::stoi(line[3].Name.substr(1, line[3].Name.length() - 1)));
 
                 stype.insert({i + offset, instruction});
                 insType.insert({i + offset, "Stype"});
@@ -197,7 +197,7 @@ class parser
                                    timeMap["jal"][3],
                                    timeMap["jal"][4],
                                    0,
-                                   -1);
+                                   0);
                                   // std::cout<<"s1 is "<<line.size()<<std::endl;
                 jLabels.insert({i + offset, line[1].Name});
                 ujtype.insert({i + offset, instruction});
@@ -229,11 +229,16 @@ class parser
     {
         if (isData(Program.at(0)))
         {
-            int i = 1, memPointer = 256;
+            Program.erase(Program.begin());
+            int i = 0, memPointer = 256;
             while (i < Program.size() && !isText(Program.at(i)))
             {
                 storeData(memory, Program.at(i), dataLabels, memPointer);
                 i++;
+            }
+            while(i--)
+            {
+                Program.erase(Program.begin());
             }
             i++;
             Program.erase(Program.begin());
@@ -242,6 +247,11 @@ class parser
         {
             Program.erase(Program.begin());
         }
+        for (size_t i = 0; i < Program.size(); i++)
+        {
+            std::cout<<Program[i]<<std::endl;
+        }
+        
     }
 };
 

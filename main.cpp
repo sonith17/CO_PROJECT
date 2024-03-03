@@ -45,25 +45,45 @@ int main(int argc, char* argv[])
         {
             timeMap[str] = {1,1,1,1,1};
         }
+        std::cout<<"i3"<<std::endl;
         parser p;
+        if(i==0){
         p.parse(Processor.memory1,Program,
-        Processor.cores[0].insType,
-        Processor.cores[0].rtype,
-        Processor.cores[0].itype,
-        Processor.cores[0].stype,
-        Processor.cores[0].sbtype,
-        Processor.cores[0].utype,
-        Processor.cores[0].ujtype,
-        Processor.cores[0].dataLabels,
-        Processor.cores[0].labels,
+        Processor.cores[i].insType,
+        Processor.cores[i].rtype,
+        Processor.cores[i].itype,
+        Processor.cores[i].stype,
+        Processor.cores[i].sbtype,
+        Processor.cores[i].utype,
+        Processor.cores[i].ujtype,
+        Processor.cores[i].dataLabels,
+        Processor.cores[i].labels,
         timeMap);
+        }
+        else
+        {
+        p.parse(Processor.memory2,Program,
+        Processor.cores[i].insType,
+        Processor.cores[i].rtype,
+        Processor.cores[i].itype,
+        Processor.cores[i].stype,
+        Processor.cores[i].sbtype,
+        Processor.cores[i].utype,
+        Processor.cores[i].ujtype,
+        Processor.cores[i].dataLabels,
+        Processor.cores[i].labels,
+        timeMap);
+        }
+        std::cout<<"i4"<<std::endl;
     }
-    // Processor.run();
-    // Processor.cores[0].printDataLabels();
-    // Processor.cores[1].printDataLabels();
-    // std::cout << "Register Contents: " << std::endl;
-    // Processor.cores[0].printRegisters();
-    // Processor.cores[1].printRegisters();
+    Processor.run();
+    Processor.cores[0].printDataLabels();
+    Processor.cores[1].printDataLabels();
+    Processor.cores[0].printLabels();
+    Processor.cores[1].printLabels();
+    std::cout << "Register Contents: " << std::endl;
+    Processor.cores[0].printRegisters();
+    Processor.cores[1].printRegisters();
     std::cout << "Memory Contents:" << std::endl;
     Processor.printMemory();
 }
