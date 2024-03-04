@@ -11,6 +11,8 @@
 class Core{
     public:
     int registers[32]={0};
+    bool write[32];
+    bool read[32];
     int programCounter =1;
     int NumOfStalls = 0;
     std::vector<std::string> Program;
@@ -216,7 +218,7 @@ class Core{
             pipeline.erase(pipeline.begin());
             Times.erase(Times.begin());
         }
-        if(pipeline[0].first.first==-1 )
+        if(pipeline[0].first.first==-1)
         {
             pipeline.erase(pipeline.begin());
             Times.erase(Times.begin());
