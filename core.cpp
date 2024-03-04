@@ -33,6 +33,9 @@ class Core{
     std::vector<std::string> executed;
     std::pair<std::string, std::string> memorized;
     bool toexecute = true;
+    bool isRAWHarzad = false;
+    std::vector<int> writeRegister;
+    std::vector<int> readRegister;
 
     void getLabels()
     {
@@ -331,6 +334,9 @@ class Core{
             result.push_back(std::to_string(rtype[pc].dest));
             result.push_back(std::to_string(rtype[pc].src1));
             result.push_back(std::to_string(rtype[pc].src2));
+            writeRegister.push_back(rtype[pc].dest);
+            readRegister.push_back(rtype[pc].src1);
+            readRegister.push_back(rtype[pc].src2);
         }
         else if(instructType=="Itype")
         {
@@ -338,6 +344,8 @@ class Core{
             result.push_back(std::to_string(itype[pc].dest));
             result.push_back(std::to_string(itype[pc].src1));
             result.push_back(std::to_string(itype[pc].immed));
+            writeRegister.push_back(itype[pc].dest);
+            readRegister.push_back(itype[pc].src1);
         }
          else if(instructType=="Stype")
         {
@@ -345,6 +353,8 @@ class Core{
             result.push_back(std::to_string(stype[pc].src1));
             result.push_back(std::to_string(stype[pc].immed));
             result.push_back(std::to_string(stype[pc].dest));
+            writeRegister.push_back(stype[pc].dest);
+            readRegister.push_back(stype[pc].src1);
         }
          else if(instructType=="SBtype")
         {
@@ -352,6 +362,8 @@ class Core{
             result.push_back(std::to_string(sbtype[pc].src1));
             result.push_back(std::to_string(sbtype[pc].src2));
             result.push_back((sbtype[pc].label));
+            readRegister.push_back(sbtype[pc].src1);
+            readRegister.push_back(sbtype[pc].src2);
         }
         else if(instructType=="Utype")
         {
