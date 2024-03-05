@@ -24,7 +24,7 @@ class processor{
             std::cout<<"i2 "<<clock<<std::endl;
             t=cores[0].RunPipeline(memory1);
             //t1=cores[1].RunPipeline(memory2);
-            
+            //printMemory();
             clock++;
         }
     }

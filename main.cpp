@@ -77,13 +77,14 @@ int main(int argc, char* argv[])
         std::cout<<"i4"<<std::endl;
     }
     Processor.run();
-    Processor.cores[0].printDataLabels();
-    Processor.cores[1].printDataLabels();
-    Processor.cores[0].printLabels();
-    Processor.cores[1].printLabels();
-    std::cout << "Register Contents: " << std::endl;
-    Processor.cores[0].printRegisters();
-    Processor.cores[1].printRegisters();
-    std::cout << "Memory Contents:" << std::endl;
-    Processor.printMemory();
+    // Processor.cores[0].printDataLabels();
+    // Processor.cores[1].printDataLabels();
+    // Processor.cores[0].printLabels();
+    // Processor.cores[1].printLabels();
+    // std::cout << "Register Contents: " << std::endl;
+    // Processor.cores[0].printRegisters();
+    // Processor.cores[1].printRegisters();
+    // std::cout << "Memory Contents:" << std::endl;
+    // Processor.printMemory();
+     std::cout<<Processor.clock<<std::endl;
 }

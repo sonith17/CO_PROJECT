@@ -36,6 +36,7 @@ class Core{
     bool isRAWHarzad = false;
     std::vector<int> writeRegister;
     std::vector<int> readRegister;
+    bool dataForward = true;
 
     void getLabels()
     {
@@ -280,6 +281,7 @@ class Core{
             }
         }
         std::cout<<"i10"<<std::endl;
+        std::cout<<"stalls is "<<NumOfStalls<<std::endl;
         printRegisters();
         return 1;
     }
@@ -388,42 +390,70 @@ class Core{
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] + registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "sub")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] - registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] - registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "and")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] & registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "or")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] | registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "xor")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] ^ registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "sll")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "srl")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))])); // value
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))];
+            }
         }
         else if(IDResults.at(0) == "slt")
         {
@@ -432,9 +462,18 @@ class Core{
             if(registers[std::stoi(IDResults.at(2))] < registers[std::stoi(IDResults.at(3))])
             {
                 exResults.push_back(std::to_string(1)); // value
+                if(this->dataForward)
+                {
+                    registers[std::stoi(IDResults.at(1))] = 1;
+                }
+
             }
             else{
                 exResults.push_back(std::to_string(0)); // value
+                if(this->dataForward)
+                {
+                    registers[std::stoi(IDResults.at(1))] = 0;
+                }
             }
         }
         else if(IDResults.at(0) == "addi")
@@ -442,36 +481,60 @@ class Core{
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "andi")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "ori")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "xori")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "slli")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "srli")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3));
+            }
         }
         else if(IDResults.at(0) == "slti")
         {
@@ -480,10 +543,18 @@ class Core{
             if(registers[std::stoi(IDResults.at(2))] < std::stoi(IDResults.at(3)))
             {
                 exResults.push_back("1");
+                if(this->dataForward)
+                {
+                    registers[std::stoi(IDResults.at(1))] = 1;
+                }
             }
             else
             {
                 exResults.push_back("0");
+                if(this->dataForward)
+                {
+                    registers[std::stoi(IDResults.at(1))] = 0;
+                }
             }
         }
         else if(IDResults.at(0) == "jalr")
@@ -491,7 +562,10 @@ class Core{
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(pc+1));
-
+            if(this->dataForward)
+            {
+                registers[std::stoi(IDResults.at(1))] = pc+1;
+            }
             pc = registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
             return exResults; 
         }
@@ -512,6 +586,10 @@ class Core{
             if(registers[stoi(IDResults.at(1))] != registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
+            }
+            else
+            {
+                pc +=1;
             }
             exResults.push_back(IDResults.at(0));
             exResults.push_back("-1");
@@ -538,6 +616,10 @@ class Core{
             {
                 pc = labels[IDResults.at(3)];
             }
+            else
+            {
+                pc +=1;
+            }
             exResults.push_back(IDResults.at(0));
             exResults.push_back("-1");
             exResults.push_back("-1");
@@ -548,6 +630,10 @@ class Core{
             if(registers[stoi(IDResults.at(1))] < registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
+            }
+            else
+            {
+                pc +=1;
             }
             exResults.push_back(IDResults.at(0));
             exResults.push_back("-1");
