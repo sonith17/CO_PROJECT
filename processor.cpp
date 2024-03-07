@@ -11,6 +11,7 @@ class processor{
     Core cores[2] = {Core(),Core()};
     int8_t memory1[2048] = {0};
     int8_t memory2[2048] = {0};
+    int t=0,t1=1;
     
     void run()
     {
@@ -18,15 +19,21 @@ class processor{
         // cores[1].getData(memory2);
         // cores[0].getLabels();
         // cores[1].getLabels();
-        int t=1,t1=0;
+        
         while(t1|t!=0)
         {
             std::cout<<"i2 "<<clock<<std::endl;
-            t=cores[0].RunPipeline(memory1);
-            //t1=cores[1].RunPipeline(memory2);
+            //t=cores[0].RunPipeline(memory1);
+            t1=cores[1].RunPipeline(memory2);
             //printMemory();
             clock++;
+            std::cout<<"Clock:"<<clock<<std::endl;
+            //if(clock > 100) break;
         }
+        // else
+        // {
+        //     std::cout<<"EOF"<<std::endl;
+        // }
     }
     void printMemory()
     {

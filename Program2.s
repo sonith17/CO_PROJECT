@@ -2,7 +2,7 @@
 .word 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1
 base: .word 0x00000100
 .text
-lw x1 base
+addi x1 x0 256
 addi x2 x0 0
 addi x2 x2 16
 selection_sort:
@@ -47,4 +47,6 @@ end_if_1:
     j for_loop_2
 end_loop_2:
     j if_2
+    addi x0 x0 0
 end_loop_1:  
+     addi x0 x0 0

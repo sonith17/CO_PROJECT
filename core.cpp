@@ -36,7 +36,8 @@ class Core{
     bool isRAWHarzad = false;
     std::vector<int> writeRegister;
     std::vector<int> readRegister;
-    bool dataForward = true;
+    bool dataForward = false;
+    std::vector<std::pair<int,std::pair<int,int>>> inUseRegisters;
 
     void getLabels()
     {
@@ -102,7 +103,9 @@ class Core{
     int RunPipeline(int8_t memory[])
     {
         std::cout<<programCounter<<"    kl  "<<insType.size()<<std::endl;
-        if(programCounter<=insType.size())pipeline.push_back({{programCounter,1},1});
+        if(programCounter>insType.size() && pipeline.empty()) return 0;
+        if(programCounter<=insType.size()&& !isRAWHarzad )pipeline.push_back({{programCounter,1},1});
+        
         std::cout << "INSTYP: " << this->instyp << std::endl;
         std::cout << "DECODED:" << std::endl;
         for(auto x: decoded)
@@ -124,12 +127,17 @@ class Core{
         }
 
         std::cout<<"i1"<<std::endl;
+        for(auto x : inUseRegisters)
+        {
+            std::cout<<x.first<<" pipierc1 "<<x.second.first<<" "<<x.second.second<<std::endl;
+        }
         std::cout<<"pr "<<programCounter<<std::endl;
-        if(programCounter>insType.size() && pipeline.empty()) return 0;
+        
         int nxtPC;
         bool stall = false;
         std::cout<<"i5"<<std::endl;
-        std::string s = insType[programCounter];
+        std::string s;
+       if(programCounter<=insType.size()) s = insType[programCounter];
         std::cout<<"i17 "<<s<<std::endl;
         if(s=="Rtype")
         {
@@ -167,18 +175,18 @@ class Core{
         for(int i =0;i<this->pipeline.size();i++)
         {
             std::cout<<"i20 "<<pipeline.size()<<std::endl;
-            if(pipeline[i].first.second ==1)
+            if(pipeline[i].first.second ==1 && !isRAWHarzad)
             {
                instyp = instructionFetch(pipeline[i].first.first);
                std::cout<<instyp<<"-------------****-"<<std::endl;
-                if(!stall) pipeline[i].second--;
+                if(!stall && !isRAWHarzad) pipeline[i].second--;
             }
             if(pipeline[i].first.second ==2)
             {
                 std::cout<<"fghj"<<std::endl;
                 decoded = instructionDecode(pipeline[i].first.first,instyp);
                 std::cout<<"fghj  "<<decoded.size()<<std::endl;
-                if(!stall) pipeline[i].second--;
+                if(!stall && !isRAWHarzad) pipeline[i].second--;
             }
             if(pipeline[i].first.second ==3)
             {
@@ -210,44 +218,64 @@ class Core{
                memorized = MEM(memory,executed);
                 pipeline[i].second--;
             }
-            if(pipeline[i].first.second ==5)
+            if(pipeline[i].first.second ==5 && pipeline[i].second==1)
             {
                 WriteBack(memorized);
                 pipeline[i].second--;
             }
         }
         std::cout<<"i7"<<std::endl;
-        if(pipeline[0].first.second==5 && pipeline[0].second==0)
+        if(pipeline[0].first.second==5 && pipeline[0].second<=0)
         {
             pipeline.erase(pipeline.begin());
             Times.erase(Times.begin());
         }
-        if(pipeline[0].first.first==-1)
+        while(pipeline[0].first.first==-1)
         {
             pipeline.erase(pipeline.begin());
             Times.erase(Times.begin());
             NumOfStalls++;
         }
         std::cout<<"i8"<<std::endl;
-        for(int i =0;i<this->pipeline.size();i++)
+        int pipeSize = this->pipeline.size();
+        for(int i =0;i<pipeSize;i++)
         {
-            std::cout<<"i3"<<std::endl;
+            std::cout<<"i3 "<<pipeline.size()<<std::endl;
             if(pipeline[i].second==0 && (pipeline[i].first.second==3||pipeline[i].first.second==4))
             {
                 pipeline[i].first.second++;
                 std::cout<<"i11"<<std::endl;
                 pipeline[i].second = Times[i][pipeline[i].first.second-1];
             }
-             if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && stall)
+            else if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && stall)
             {
                
             }
-            else if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && !stall)
+            else if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && !stall && !isRAWHarzad)
             {
                 pipeline[i].first.second++;
                 std::cout<<"i12 "<<i<<" "<<Times.size()<<std::endl;
                 pipeline[i].second = Times[i][pipeline[i].first.second-1];
                 std::cout<<"i14"<<std::endl;
+            }
+            else if(isRAWHarzad && pipeline[i].first.second==2)
+            {
+                std::cout<<"HI LOOP "<<std::endl;
+                int k1 =0;
+                int n1 = pipeline.size();
+                auto it = pipeline.begin();
+                for(int q = 0;q<n1;q++)
+                {
+                    if(pipeline[q].first.second==2)
+                    {
+                        break;
+                    }
+                    k1++;
+                    it++;
+                }
+                pipeline.insert(it,{{-1,-1},-1});
+                Times.insert(Times.begin()+k1,{1,1,1,1,1});
+                break;
             }
         }
         std::cout<<"i9"<<std::endl;
@@ -259,23 +287,50 @@ class Core{
         {
             if(BranchTaken)
             {
-                pipeline.pop_back();
-                pipeline.pop_back();
-                Times.pop_back();
-                Times.pop_back();
+                
+                if(isRAWHarzad)
+                {
+                    if(pipeline.back().first.second ==1)
+                    {
+                        pipeline.pop_back();
+                        Times.pop_back();
+                    }
+                    if(pipeline.back().first.second ==2)
+                    {
+                        pipeline.pop_back();
+                        Times.pop_back();
+                    }
+                    isRAWHarzad = false;
+                }
+                else
+                {
+                    if(pipeline.back().first.second ==2)
+                    {
+                        pipeline.pop_back();
+                        Times.pop_back();
+                    }
+                    if(pipeline.back().first.second ==3)
+                    {
+                        pipeline.pop_back();
+                        Times.pop_back();
+                    }
+                    inUseRegisters.pop_back();
+
+                }
+
                 pipeline.push_back({{-1,-1},-1});
                 pipeline.push_back({{-1,-1},-1});
-                Times.push_back({-1,-1,-1,-1,-1});
-                Times.push_back({-1,-1,-1,-1,-1});
+                Times.push_back({1,1,1,1,1});
+                Times.push_back({1,1,1,1,1});
                 programCounter = nxtPC;
                 //pipeline.push_back({{programCounter,1},1});
                 BranchTaken = false;
-                NumOfStalls+=2;
+                //NumOfStalls+=2;
             }
             else
             {
                 
-                programCounter++;
+                if(!isRAWHarzad && programCounter<=insType.size() )programCounter++;
                // pipeline.push_back({{programCounter,1},1});
                 
             }
@@ -322,23 +377,23 @@ class Core{
 
     std::string instructionFetch(int pc)
     {
-        std::string instructType = insType[pc];
+        std::string instructType;
+        if(pc<=insType.size())  instructType = insType[pc];
         std::cout<<instructType<<"*********"<<pc<<std::endl;
         return instructType;
     }
     std::vector<std::string> instructionDecode(int pc , std::string instructType)
     {
         std::vector<std::string> result;
-        std::cout<<instructType<<"---------------"<<std::endl;
+        std::pair<int,std::pair<int,int>>toBeUsedRegisters;
+        std::cout<<instructType<<"------789---------"<<pc<<std::endl;
         if(instructType =="Rtype")
         {
             result.push_back((rtype[pc].opcode));
             result.push_back(std::to_string(rtype[pc].dest));
             result.push_back(std::to_string(rtype[pc].src1));
             result.push_back(std::to_string(rtype[pc].src2));
-            writeRegister.push_back(rtype[pc].dest);
-            readRegister.push_back(rtype[pc].src1);
-            readRegister.push_back(rtype[pc].src2);
+            toBeUsedRegisters = {rtype[pc].dest,{rtype[pc].src1,rtype[pc].src2}};
         }
         else if(instructType=="Itype")
         {
@@ -346,8 +401,7 @@ class Core{
             result.push_back(std::to_string(itype[pc].dest));
             result.push_back(std::to_string(itype[pc].src1));
             result.push_back(std::to_string(itype[pc].immed));
-            writeRegister.push_back(itype[pc].dest);
-            readRegister.push_back(itype[pc].src1);
+            toBeUsedRegisters = {itype[pc].dest,{itype[pc].src1,-1}};
         }
          else if(instructType=="Stype")
         {
@@ -355,8 +409,7 @@ class Core{
             result.push_back(std::to_string(stype[pc].src1));
             result.push_back(std::to_string(stype[pc].immed));
             result.push_back(std::to_string(stype[pc].dest));
-            writeRegister.push_back(stype[pc].dest);
-            readRegister.push_back(stype[pc].src1);
+            toBeUsedRegisters = {-1,{stype[pc].src1,stype[pc].dest}};
         }
          else if(instructType=="SBtype")
         {
@@ -366,6 +419,7 @@ class Core{
             result.push_back((sbtype[pc].label));
             readRegister.push_back(sbtype[pc].src1);
             readRegister.push_back(sbtype[pc].src2);
+            toBeUsedRegisters = {-1,{sbtype[pc].src1,sbtype[pc].src2}};
         }
         else if(instructType=="Utype")
         {
@@ -379,12 +433,29 @@ class Core{
             result.push_back(std::to_string(ujtype[pc].dest));
             result.push_back(std::to_string(ujtype[pc].immed));
         }
+        for(std::pair<int,std::pair<int,int>>x : inUseRegisters)
+        {
+            if(x.first== toBeUsedRegisters.second.first && x.first!= -1)
+            {
+                isRAWHarzad = true;
+                break;
+            }
+            if(x.first== toBeUsedRegisters.second.second && x.first!= -1)
+            {
+                isRAWHarzad = true;
+                break;
+            }
+        }
+        if(!isRAWHarzad)
+        {
+            inUseRegisters.push_back(toBeUsedRegisters);
+        }
         return result;
     }
 
     std::vector<std::string> Execute(int &pc, std::vector<std::string> IDResults){
         std::vector<std::string> exResults;
-        std::cout<<"i26 "<<IDResults.size()<<std::endl;
+        std::cout<<"i27 "<<IDResults.size()<<std::endl;
         if(IDResults.at(0) == "add")
         {
             exResults.push_back(IDResults.at(0)); //opcode
@@ -439,20 +510,20 @@ class Core{
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))])); // value
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))];
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "srl")
         {
             exResults.push_back(IDResults.at(0)); //opcode
             exResults.push_back(IDResults.at(1)); //destination
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))])); // value
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))];
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "slt")
@@ -520,20 +591,20 @@ class Core{
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3));
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "srli")
         {
             exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
-            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
+            exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3));
+                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "slti")
@@ -702,12 +773,14 @@ class Core{
 
     void WriteBack(std::pair<std::string, std::string> memResults)
     {
-        if(memResults.first != "-1" && memResults.second != "-1")
+        if(memResults.first != "-1" )
         {
             std::cout<<"i26 "<<memResults.first<<" "<<memResults.second<<std::endl;
             registers[std::stoi(memResults.first)] = std::stoi(memResults.second);
         }
          registers[0]=0;
+         if(!inUseRegisters.empty()) inUseRegisters.erase(inUseRegisters.begin());
+         isRAWHarzad = false;
     }
    
 };

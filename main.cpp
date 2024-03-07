@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     {
         FilePaths.push_back(argv[i]);
     }
-    for(int i =0;i<1;i++)
+    for(int i =0;i<2;i++)
     {
         path path = FilePaths[i]; 
         if (!std::filesystem::exists(path)) {
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         {
             timeMap[str] = {1,1,1,1,1};
         }
-        std::cout<<"i3"<<std::endl;
+        std::cout<<"i3 "<<i<<std::endl;
         parser p;
         if(i==0){
         p.parse(Processor.memory1,Program,
@@ -76,15 +76,24 @@ int main(int argc, char* argv[])
         }
         std::cout<<"i4"<<std::endl;
     }
+    // int x;
+    // std::cin>>x;
+    // std::cout<<"Enter x\n";
+    // while(x!=-1)
+    // {
+    //     Processor.run();
+    //     std::cout<<"Enter x\n";
+    //     std::cin>>x;
+    // }
     Processor.run();
-    // Processor.cores[0].printDataLabels();
-    // Processor.cores[1].printDataLabels();
-    // Processor.cores[0].printLabels();
-    // Processor.cores[1].printLabels();
-    // std::cout << "Register Contents: " << std::endl;
-    // Processor.cores[0].printRegisters();
-    // Processor.cores[1].printRegisters();
-    // std::cout << "Memory Contents:" << std::endl;
-    // Processor.printMemory();
+    Processor.cores[0].printDataLabels();
+    Processor.cores[1].printDataLabels();
+    Processor.cores[0].printLabels();
+    Processor.cores[1].printLabels();
+    std::cout << "Register Contents: " << std::endl;
+    Processor.cores[0].printRegisters();
+    Processor.cores[1].printRegisters();
+    std::cout << "Memory Contents:" << std::endl;
+    Processor.printMemory();
      std::cout<<Processor.clock<<std::endl;
 }

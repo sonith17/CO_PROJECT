@@ -85,8 +85,8 @@ class parser
                                   timeMap[line[0].Name][2],
                                   timeMap[line[0].Name][3],
                                   timeMap[line[0].Name][4],
-                                  std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)),
-                                  0);
+                                  0,
+                                  std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)));
                 utype.insert({i + offset, instruction});
                 insType.insert({i + offset, "Utype"});
                 
@@ -102,6 +102,7 @@ class parser
 
                 itype.insert({i + offset+1, instruction1});
                 insType.insert({i + offset+1, "Itype"});
+                offset++;
             }
 
             else if (instrMap[line[0].Name] == "Itype")
