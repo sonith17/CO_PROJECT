@@ -33,9 +33,7 @@ class Core{
     std::vector<std::string> executed;
     std::pair<std::string, std::string> memorized;
     bool toexecute = true;
-    bool isRAWHarzad = false;
-    std::vector<int> writeRegister;
-    std::vector<int> readRegister;
+    bool isRAWHarzad = false;;
     bool dataForward = false;
     std::vector<std::pair<int,std::pair<int,int>>> inUseRegisters;
 
@@ -417,8 +415,6 @@ class Core{
             result.push_back(std::to_string(sbtype[pc].src1));
             result.push_back(std::to_string(sbtype[pc].src2));
             result.push_back((sbtype[pc].label));
-            readRegister.push_back(sbtype[pc].src1);
-            readRegister.push_back(sbtype[pc].src2);
             toBeUsedRegisters = {-1,{sbtype[pc].src1,sbtype[pc].src2}};
         }
         else if(instructType=="Utype")
