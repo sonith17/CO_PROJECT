@@ -29,6 +29,7 @@ class processor{
             clock++;
             std::cout<<"Clock:"<<clock<<std::endl;
             //if(clock > 100) break;
+            //printMemory();
         }
         // else
         // {

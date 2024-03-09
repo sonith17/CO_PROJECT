@@ -34,8 +34,9 @@ class Core{
     std::pair<std::string, std::string> memorized;
     bool toexecute = true;
     bool isRAWHarzad = false;;
-    bool dataForward = false;
+    bool dataForward = true;
     std::vector<std::pair<int,std::pair<int,int>>> inUseRegisters;
+    int tempregisters[32];
 
     void getLabels()
     {
@@ -312,7 +313,7 @@ class Core{
                         pipeline.pop_back();
                         Times.pop_back();
                     }
-                    inUseRegisters.pop_back();
+                    if(!inUseRegisters.empty())inUseRegisters.pop_back();
 
                 }
 
@@ -336,6 +337,14 @@ class Core{
         std::cout<<"i10"<<std::endl;
         std::cout<<"stalls is "<<NumOfStalls<<std::endl;
         printRegisters();
+        std::cout << "------------------------------------------------------------------------------------------------------" << std::endl;
+        for(int i=0;i<32;i++)
+        {
+            std::cout<< "|" << tempregisters[i]<<" ";
+        }
+        std::cout << "|";
+        std::cout<<std::endl;
+        std::cout << "------------------------------------------------------------------------------------------------------" << std::endl;
         return 1;
     }
 
@@ -382,6 +391,7 @@ class Core{
     }
     std::vector<std::string> instructionDecode(int pc , std::string instructType)
     {
+        bool isLW = false;
         std::vector<std::string> result;
         std::pair<int,std::pair<int,int>>toBeUsedRegisters;
         std::cout<<instructType<<"------789---------"<<pc<<std::endl;
@@ -400,6 +410,11 @@ class Core{
             result.push_back(std::to_string(itype[pc].src1));
             result.push_back(std::to_string(itype[pc].immed));
             toBeUsedRegisters = {itype[pc].dest,{itype[pc].src1,-1}};
+            if(result[0]=="lw")
+            {
+                std::cout<< " ISLW "<<std::endl;
+                isLW = true;
+            }
         }
          else if(instructType=="Stype")
         {
@@ -442,7 +457,11 @@ class Core{
                 break;
             }
         }
-        if(!isRAWHarzad)
+        if(!isRAWHarzad && !this->dataForward)
+        {
+            inUseRegisters.push_back(toBeUsedRegisters);
+        }
+        if(!isRAWHarzad && this->dataForward && isLW)
         {
             inUseRegisters.push_back(toBeUsedRegisters);
         }
@@ -459,7 +478,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] + registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] + tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "sub")
@@ -469,7 +488,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] - registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] - registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] - tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "and")
@@ -479,7 +498,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] & registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] & tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "or")
@@ -489,7 +508,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] | registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] | tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "xor")
@@ -499,7 +518,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] ^ registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] ^ tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "sll")
@@ -509,7 +528,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] << tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "srl")
@@ -519,7 +538,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))])); // value
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> registers[std::stoi(IDResults.at(3))];
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] >> tempregisters[std::stoi(IDResults.at(3))];
             }
         }
         else if(IDResults.at(0) == "slt")
@@ -531,7 +550,7 @@ class Core{
                 exResults.push_back(std::to_string(1)); // value
                 if(this->dataForward)
                 {
-                    registers[std::stoi(IDResults.at(1))] = 1;
+                    tempregisters[std::stoi(IDResults.at(1))] = 1;
                 }
 
             }
@@ -539,7 +558,7 @@ class Core{
                 exResults.push_back(std::to_string(0)); // value
                 if(this->dataForward)
                 {
-                    registers[std::stoi(IDResults.at(1))] = 0;
+                    tempregisters[std::stoi(IDResults.at(1))] = 0;
                 }
             }
         }
@@ -550,7 +569,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "andi")
@@ -560,7 +579,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] & std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "ori")
@@ -570,7 +589,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] | std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "xori")
@@ -580,7 +599,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] ^ std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "slli")
@@ -590,7 +609,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] << std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "srli")
@@ -600,7 +619,7 @@ class Core{
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3))));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = registers[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3));
+                tempregisters[std::stoi(IDResults.at(1))] = tempregisters[std::stoi(IDResults.at(2))] >> std::stoi(IDResults.at(3));
             }
         }
         else if(IDResults.at(0) == "slti")
@@ -612,7 +631,7 @@ class Core{
                 exResults.push_back("1");
                 if(this->dataForward)
                 {
-                    registers[std::stoi(IDResults.at(1))] = 1;
+                    tempregisters[std::stoi(IDResults.at(1))] = 1;
                 }
             }
             else
@@ -620,7 +639,7 @@ class Core{
                 exResults.push_back("0");
                 if(this->dataForward)
                 {
-                    registers[std::stoi(IDResults.at(1))] = 0;
+                    tempregisters[std::stoi(IDResults.at(1))] = 0;
                 }
             }
         }
@@ -631,25 +650,60 @@ class Core{
             exResults.push_back(std::to_string(pc+1));
             if(this->dataForward)
             {
-                registers[std::stoi(IDResults.at(1))] = pc+1;
+                tempregisters[std::stoi(IDResults.at(1))] = pc+1;
             }
             pc = registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3));
             return exResults; 
         }
         else if(IDResults.at(0) == "lw")
         {
-            exResults.push_back(IDResults.at(0));
+            if(!dataForward)
+            {
+                exResults.push_back(IDResults.at(0));
             exResults.push_back(IDResults.at(1));
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
+            }
+            else
+            {
+                exResults.push_back(IDResults.at(0));
+            exResults.push_back(IDResults.at(1));
+            exResults.push_back(std::to_string(tempregisters[std::stoi(IDResults.at(2))] + std::stoi(IDResults.at(3))));
+
+            }
+            
         }
         else if(IDResults.at(0) == "sw")
         {
-            exResults.push_back(IDResults.at(0));  // opcode
+            if(!dataForward)
+            {
+                 exResults.push_back(IDResults.at(0));  // opcode
             exResults.push_back(std::to_string(registers[std::stoi(IDResults.at(3))] + std::stoi(IDResults.at(2)))); // destination
             exResults.push_back((IDResults.at(1)));  // value
+            }
+            else
+            {
+            exResults.push_back(IDResults.at(0));  // opcode
+            exResults.push_back(std::to_string(tempregisters[std::stoi(IDResults.at(3))] + std::stoi(IDResults.at(2)))); // destination
+            exResults.push_back((IDResults.at(1)));  // value
+            }
         }
         else if(IDResults.at(0) == "bne")
         {
+            if(this->dataForward)
+            {
+                if(tempregisters[stoi(IDResults.at(1))] != tempregisters[stoi(IDResults.at(2))])
+                {
+                    pc = labels[IDResults.at(3)];
+                }
+                else
+                {
+                    pc +=1;
+                }
+                exResults.push_back(IDResults.at(0));
+                exResults.push_back("-1");
+                exResults.push_back("-1");
+                return exResults;
+            }
             if(registers[stoi(IDResults.at(1))] != registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
@@ -661,9 +715,26 @@ class Core{
             exResults.push_back(IDResults.at(0));
             exResults.push_back("-1");
             exResults.push_back("-1");
+            return exResults;
+            
         }
         else if(IDResults.at(0) == "beq")
         {
+            if(this->dataForward)
+            {
+                if(tempregisters[stoi(IDResults.at(1))] == tempregisters[stoi(IDResults.at(2))])
+                {
+                    pc = labels[IDResults.at(3)];
+                }
+                else
+                {
+                    pc +=1;
+                }
+                exResults.push_back(IDResults.at(0));
+                exResults.push_back("-1");
+                exResults.push_back("-1");
+                return exResults;
+            }
             if(registers[stoi(IDResults.at(1))] == registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
@@ -679,6 +750,21 @@ class Core{
         }
         else if(IDResults.at(0) == "bge")
         {
+            if(this->dataForward)
+            {
+                if(tempregisters[stoi(IDResults.at(1))] >= tempregisters[stoi(IDResults.at(2))])
+                {
+                    pc = labels[IDResults.at(3)];
+                }
+                else
+                {
+                    pc +=1;
+                }
+                exResults.push_back(IDResults.at(0));
+                exResults.push_back("-1");
+                exResults.push_back("-1");
+                return exResults;
+            }
             if(registers[stoi(IDResults.at(1))] >= registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
@@ -694,6 +780,21 @@ class Core{
         }
         else if(IDResults.at(0) == "blt")
         {
+            if(this->dataForward)
+            {
+                if(tempregisters[stoi(IDResults.at(1))] < tempregisters[stoi(IDResults.at(2))])
+                {
+                    pc = labels[IDResults.at(3)];
+                }
+                else
+                {
+                    pc +=1;
+                }
+                exResults.push_back(IDResults.at(0));
+                exResults.push_back("-1");
+                exResults.push_back("-1");
+                return exResults;
+            }
             if(registers[stoi(IDResults.at(1))] < registers[stoi(IDResults.at(2))])
             {
                 pc = labels[IDResults.at(3)];
@@ -739,12 +840,24 @@ class Core{
             int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
             memResults.first = exResults.at(1);
             memResults.second = std::to_string(value);
+            if(this->dataForward)
+            {
+                tempregisters[std::stoi(memResults.first)]=value;
+            }
+            if(this->dataForward && !inUseRegisters.empty()) inUseRegisters.erase(inUseRegisters.begin());
         }
         else if(exResults.at(0) == "sw")
         {
             std::cout<<" I came "<<std::endl;
             uint8_t *po;
-            po = (uint8_t*)&registers[std::stoi(exResults.at(2))];
+            if(this->dataForward)
+            {
+                po = (uint8_t*)&tempregisters[std::stoi(exResults.at(2))];
+            }
+            else
+            {
+                po = (uint8_t*)&registers[std::stoi(exResults.at(2))];
+            }
             int address = std::stoi(exResults.at(1));
             for(int i =0;i<4;i++)
             {
@@ -769,14 +882,28 @@ class Core{
 
     void WriteBack(std::pair<std::string, std::string> memResults)
     {
-        if(memResults.first != "-1" )
+        if(!dataForward)
         {
-            std::cout<<"i26 "<<memResults.first<<" "<<memResults.second<<std::endl;
-            registers[std::stoi(memResults.first)] = std::stoi(memResults.second);
+            if(memResults.first != "-1" )
+            {
+                std::cout<<"i26 "<<memResults.first<<" "<<memResults.second<<std::endl;
+                registers[std::stoi(memResults.first)] = std::stoi(memResults.second);
+            }
+            registers[0]=0;
+            if(!inUseRegisters.empty()) inUseRegisters.erase(inUseRegisters.begin());
+            isRAWHarzad = false;
         }
-         registers[0]=0;
-         if(!inUseRegisters.empty()) inUseRegisters.erase(inUseRegisters.begin());
-         isRAWHarzad = false;
+        else
+        {
+            if(memResults.first != "-1" )
+            {
+                std::cout<<"i26 "<<memResults.first<<" "<<memResults.second<<std::endl;
+                registers[std::stoi(memResults.first)] =tempregisters[std::stoi(memResults.first)];
+            }
+            registers[0]=0;
+            isRAWHarzad = false;
+        }
+        
     }
    
 };
