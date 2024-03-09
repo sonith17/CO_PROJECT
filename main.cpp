@@ -41,12 +41,14 @@ int main(int argc, char* argv[])
         std::map<std::string, std::vector<int>> timeMap;
         std::vector<std::string> ins={"add","sub","or","and","xor","slt","srl","sll","addi","subi","ori","andi","xori","slti","srli","slli","jalr","lw",
                                  "sw","beq","bne","blt","bge","auipc","jal"};
+        std::cout << "Latency from user needs to be taken" << std::endl;
         for(std:: string str: ins)
         {
-            timeMap[str] = {1,1,1,1,1};
+            timeMap[str] = {1,1,2,1,1};
         }
-        std::cout<<"i3 "<<i<<std::endl;
+        std::cout << "Latency from the user has been taken" << std::endl;
         parser p;
+        std::cout << "The Program has started it's parsing" << std::endl;
         if(i==0){
         p.parse(Processor.memory1,Program,
         Processor.cores[i].insType,
@@ -74,7 +76,7 @@ int main(int argc, char* argv[])
         Processor.cores[i].labels,
         timeMap);
         }
-        std::cout<<"i4"<<std::endl;
+        std::cout<<"The Program has completed the parsing the instructions"<<std::endl;
     }
     // int x;
     // std::cin>>x;
@@ -95,5 +97,5 @@ int main(int argc, char* argv[])
     Processor.cores[1].printRegisters();
     std::cout << "Memory Contents:" << std::endl;
     Processor.printMemory();
-     std::cout<<Processor.clock<<std::endl;
+    std::cout<<Processor.clock<<std::endl;
 }

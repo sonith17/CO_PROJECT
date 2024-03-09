@@ -28,7 +28,7 @@ class processor{
             //printMemory();
             clock++;
             std::cout<<"Clock:"<<clock<<std::endl;
-            //if(clock > 100) break;
+            // if(clock > 500) break;
             //printMemory();
         }
         // else

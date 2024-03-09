@@ -6,13 +6,15 @@
 #include <stdint.h>
 #include "EXE.cpp"
 #include <utility>
+#include "Token.hpp"
+#include "id.hpp"
 
 
 class Core{
     public:
     int registers[32]={0};
-    bool write[32];
-    bool read[32];
+    // bool write[32];
+    // bool read[32];
     int programCounter =1;
     int NumOfStalls = 0;
     std::vector<std::string> Program;
@@ -34,14 +36,15 @@ class Core{
     std::pair<std::string, std::string> memorized;
     bool toexecute = true;
     bool isRAWHarzad = false;;
-    bool dataForward = true;
+    bool dataForward = false;
     std::vector<std::pair<int,std::pair<int,int>>> inUseRegisters;
     int tempregisters[32];
+    bool stall = false;
 
-    void getLabels()
-    {
-        labels = get_labels(Program);
-    }
+    // void getLabels()
+    // {
+    //     labels = get_labels(Program);
+    // }
     void getData(int8_t memory[])
     {
         if(isData(Program.at(0)))
@@ -73,38 +76,54 @@ class Core{
         std::cout<<std::endl;
         std::cout << "------------------------------------------------------------------------------------------------------" << std::endl;
     }
-    int executeLine(int8_t memory[])
-    {
-        if(programCounter>=Program.size()) return 0;
-        std::vector <Token> LineTokens = Tokenizer(Program[programCounter],programCounter);
-        if(LineTokens.size()==0)
-        {
-            programCounter++;
-            return 1;
-        }
-        EXE executer;
-        int address = executer.execute(LineTokens,registers,programCounter,labels,dataLabels);
-        if(address != -1)
-        {
-            if(LineTokens[0].Name=="sw")
-            {
-                storeWord(address, LineTokens, memory);
-            }
-            else if(LineTokens[0].Name=="lw")
-            {
-                loadWord(address, LineTokens, memory);
-            }
-        }
-        return 1;
-    }
+    // int executeLine(int8_t memory[])
+    // {
+    //     if(programCounter>=Program.size()) return 0;
+    //     std::vector <Token> LineTokens = Tokenizer(Program[programCounter],programCounter);
+    //     if(LineTokens.size()==0)
+    //     {
+    //         programCounter++;
+    //         return 1;
+    //     }
+    //     EXE executer;
+    //     int address = executer.execute(LineTokens,registers,programCounter,labels,dataLabels);
+    //     if(address != -1)
+    //     {
+    //         if(LineTokens[0].Name=="sw")
+    //         {
+    //             storeWord(address, LineTokens, memory);
+    //         }
+    //         else if(LineTokens[0].Name=="lw")
+    //         {
+    //             loadWord(address, LineTokens, memory);
+    //         }
+    //     }
+    //     return 1;
+    // }
 
 
     int RunPipeline(int8_t memory[])
     {
-        std::cout<<programCounter<<"    kl  "<<insType.size()<<std::endl;
-        if(programCounter>insType.size() && pipeline.empty()) return 0;
-        if(programCounter<=insType.size()&& !isRAWHarzad )pipeline.push_back({{programCounter,1},1});
-        
+        std::cout << "The Pipeline's 1's line" << std::endl;
+        if(programCounter>insType.size() && pipeline.empty()) 
+        {
+            return 0;
+        }
+        std::cout << "The instructions are less than total and Pipeline not empty" << std::endl;
+        if(programCounter<=insType.size()&& !isRAWHarzad && !stall)
+        {
+            pipeline.push_back({{programCounter,1},1});
+            std::cout << "The instruction is less than total and is there is no Data Hazard" << std::endl;
+        }
+        std::cout << "Start of the every Pipeline: " << std::endl;
+        std::cout << "--------------------------------------------------------------------------------------------------" << std::endl;
+        for(auto x: pipeline)
+        {
+            std::cout << "PC: " << x.first.first <<" Stage: " << x.first.second << "Times: " << x.second << std::endl;
+        }
+        std::cout << "--------------------------------------------------------------------------------------------------" << std::endl;
+        std::cout << "Present information in Temperory registers" << std::endl;
+
         std::cout << "INSTYP: " << this->instyp << std::endl;
         std::cout << "DECODED:" << std::endl;
         for(auto x: decoded)
@@ -117,149 +136,203 @@ class Core{
             std::cout << x << std::endl;
         }
         std::cout << "Memorized: " << std::endl;
-        std::cout << memorized.first << "----"<< memorized.second<< std::endl;
+        std::cout << "A" << memorized.first << "B" << memorized.second<< std::endl;
 
         std::cout << "WriteBack" << std::endl;
         for(auto x : pipeline)
         {
-            std::cout<<x.first.first<<" pipierc "<<x.first.second<<" "<<x.second<<std::endl;
+            std::cout<< "A " << x.first.first<<" B "<<x.first.second<<" C "<<x.second<<std::endl;
         }
 
-        std::cout<<"i1"<<std::endl;
+        std::cout << "Completed in display temperory registers" << std::endl;
+
+        std::cout << "Displaying inUsedRegisters" << std::endl;
         for(auto x : inUseRegisters)
         {
             std::cout<<x.first<<" pipierc1 "<<x.second.first<<" "<<x.second.second<<std::endl;
         }
-        std::cout<<"pr "<<programCounter<<std::endl;
+        std::cout << "Completed Displaying inUsedRegisters" << std::endl;
         
         int nxtPC;
-        bool stall = false;
-        std::cout<<"i5"<<std::endl;
+        stall = false;
         std::string s;
-       if(programCounter<=insType.size()) s = insType[programCounter];
-        std::cout<<"i17 "<<s<<std::endl;
+       if(programCounter<=insType.size())
+       {
+         s = insType[programCounter];
+         std::cout << "Program Counter " << programCounter << " is less than isType " << insType.size() << std::endl;
+       }
+        std::cout << "Inserting the times of each instruction into the pipeline" << std::endl;
         if(s=="Rtype")
         {
             std::vector<int> latency = {rtype[programCounter].IF_t,rtype[programCounter].ID_t,rtype[programCounter].EX_t,rtype[programCounter].MEM_t,rtype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted RType Times into the pipeline" << std::endl;
         }
         if(s=="Itype")
         {
             std::vector<int> latency = {itype[programCounter].IF_t,itype[programCounter].ID_t,itype[programCounter].EX_t,itype[programCounter].MEM_t,itype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted IType Times into the pipeline" << std::endl;
         }
         if(s=="Stype")
         {
             std::vector<int> latency = {stype[programCounter].IF_t,stype[programCounter].ID_t,stype[programCounter].EX_t,stype[programCounter].MEM_t,stype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted SType Times into the pipeline" << std::endl;
         }
         if(s=="SBtype")
         {
             std::vector<int> latency = {sbtype[programCounter].IF_t,sbtype[programCounter].ID_t,sbtype[programCounter].EX_t,sbtype[programCounter].MEM_t,sbtype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted SBType Times into the pipeline" << std::endl;
         }
         if(s=="Utype")
         {
             std::cout<<"i16 "<<std::endl;
             std::vector<int> latency = {utype[programCounter].IF_t,utype[programCounter].ID_t,utype[programCounter].EX_t,utype[programCounter].MEM_t,utype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted UType Times into the pipeline" << std::endl;
         }
         if(s=="UJ1type")
         {
             std::vector<int> latency = {ujtype[programCounter].IF_t,ujtype[programCounter].ID_t,ujtype[programCounter].EX_t,ujtype[programCounter].MEM_t,ujtype[programCounter].WB_t};
             Times.push_back(latency);
+            std::cout << "Inserted UJ1Type Times into the pipeline" << std::endl;
         }
-        std::cout<<"i6"<<std::endl;
-        
+        std::cout << "Inserting Appropriate Time is completed." << std::endl;
+        std::cout << "The execution of the Pipeline starts for Pipeline.size() " << pipeline.size() << std::endl; 
         for(int i =0;i<this->pipeline.size();i++)
         {
-            std::cout<<"i20 "<<pipeline.size()<<std::endl;
-            if(pipeline[i].first.second ==1 && !isRAWHarzad)
+            std::cout << "1st Line in Pipeline, pc: " << programCounter <<  std::endl;
+            if(pipeline[i].first.second ==1 && !isRAWHarzad &&!stall)
             {
-               instyp = instructionFetch(pipeline[i].first.first);
-               std::cout<<instyp<<"-------------****-"<<std::endl;
-                if(!stall && !isRAWHarzad) pipeline[i].second--;
+                instyp = instructionFetch(pipeline[i].first.first);
+                std::cout<<"Just Now:Instruction Fetch is Completed: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2" << instyp << std::endl;
+                if(!stall && !isRAWHarzad)
+                {
+                    std::cout << "There is no Stall, and No Raw Hazards , so decreasinig the times " << std::endl; 
+                    pipeline[i].second--;
+                }
             }
-            if(pipeline[i].first.second ==2)
+            if(pipeline[i].first.second ==2 && !stall)
             {
-                std::cout<<"fghj"<<std::endl;
                 decoded = instructionDecode(pipeline[i].first.first,instyp);
-                std::cout<<"fghj  "<<decoded.size()<<std::endl;
-                if(!stall && !isRAWHarzad) pipeline[i].second--;
+                std::cout << "Just Now: Instruction Decode has compeleted: "<<std::endl;
+                for(auto x: decoded)
+                {
+                    std::cout << x << " ";
+                }
+                std::cout << std::endl;
+                if(!stall && !isRAWHarzad)
+                {
+                    pipeline[i].second--;
+                    std::cout << "There is no Stall or Hazard, so decreased the times" << std::endl; 
+                }
             }
             if(pipeline[i].first.second ==3)
             {
-                std::cout<<"i21 "<<std::endl;
-                int currPC = pipeline[i].first.first;
-                std::cout<<"i22 "<<std::endl;
-                executed = Execute(pipeline[i].first.first,decoded);
-                std::cout<<"i23 "<<std::endl;
-                nxtPC = pipeline[i].first.first;
-                std:: cout<<nxtPC<<")))))))))))))))))))))"<<currPC<<std::endl;
-                if(nxtPC-currPC!=1)
+                if(pipeline[i].second == 1)
                 {
-
-                    BranchTaken = true;
+                    int currPC = pipeline[i].first.first;
+                    executed = Execute(pipeline[i].first.first,decoded);
+                    std::cout << "Just Now, Execute has completed: " << std::endl;
+                    for(auto x: executed)
+                    {
+                        std::cout << x << " ";
+                    }
+                    std::cout << std::endl;
+                    nxtPC = pipeline[i].first.first;
+                    std::cout << "Present PC: " << currPC << "Next PC: " << nxtPC << std::endl;
+                    if(nxtPC-currPC!=1)
+                    {
+                        std::cout << "Branch Taken is turned true" << std::endl;
+                        BranchTaken = true;
+                    }
+                    pipeline[i].first.first = currPC;
                 }
-                pipeline[i].first.first = currPC;
                 pipeline[i].second--;
+                std::cout << "Decrease the times by 1, after this stage, no conditions check: because it should go till WB()" << std::endl;
                 if(pipeline[i].second>0)
                 {
+                    std::cout << "Check the Stage of the current instruction and is above 0" << std::endl;
+                    std::cout << "Stall is turned true" << std::endl;
                     stall = true;
                 }
                 else
                 {
+                    std::cout << "The stall is made false" << std::endl;
                     stall = false;
                 }
             }
             if(pipeline[i].first.second ==4)
             {
-               memorized = MEM(memory,executed);
+                memorized = MEM(memory,executed);
+                std::cout << "Just Now, MEM is completed " << std::endl;
+                std:: cout << "Dest: " << memorized.first << "Value: " << memorized.second << std::endl;
                 pipeline[i].second--;
+                std::cout << "The times of the present instruction has decreased" << std::endl;
             }
             if(pipeline[i].first.second ==5 && pipeline[i].second==1)
             {
                 WriteBack(memorized);
+                std::cout << "Just now WriteBack is completed " << std::endl;
                 pipeline[i].second--;
+                std::cout << "The times of the present instruction has decreased" << std::endl;
             }
         }
-        std::cout<<"i7"<<std::endl;
+        std::cout << "Started to make changes in the pipeline " << std::endl;
+        std::cout << "Before Making Changes: " << std::endl;
+        std::cout << "--------------------------------------------------------------------------------------" << std::endl;
+        for(auto x: pipeline)
+        {
+            std::cout << "PC: " << x.first.first <<" Stage: " << x.first.second << "Times: " << x.second << std::endl;
+        }
+        std::cout << "---------------------------------------------------------------------------------------" << std::endl;
         if(pipeline[0].first.second==5 && pipeline[0].second<=0)
         {
+            std::cout << "An instruction at the top is at the stage == 5, and times is neagtive and 0" << std::endl;
             pipeline.erase(pipeline.begin());
+            std::cout << "Erased the top instruction & Times in the pipeline" << std::endl;
             Times.erase(Times.begin());
         }
+        std::cout << "If there are pc = -1(stall) in it, we are removing all of it, at the same stage: " << std::endl;
+        std::cout << "Before Stall count: " << NumOfStalls << std::endl;
         while(pipeline[0].first.first==-1)
         {
+            std::cout << "Erased the top instruction & Times in the pipeline" << std::endl;
             pipeline.erase(pipeline.begin());
             Times.erase(Times.begin());
-            NumOfStalls++;
+            NumOfStalls++; 
         }
-        std::cout<<"i8"<<std::endl;
+        std::cout << "After Stall count: " << NumOfStalls << std::endl;
+        std::cout << "Going into another for loop for Pipeline.size() : " << pipeline.size() << " times" << std::endl;
         int pipeSize = this->pipeline.size();
         for(int i =0;i<pipeSize;i++)
         {
-            std::cout<<"i3 "<<pipeline.size()<<std::endl;
+            std::cout<<"Entered the for loop: (Pipeline.size: )"<<pipeline.size()<<std::endl;
             if(pipeline[i].second==0 && (pipeline[i].first.second==3||pipeline[i].first.second==4))
             {
+                std::cout << "Times == 0 & Stage == 3|4" << std::endl;
                 pipeline[i].first.second++;
-                std::cout<<"i11"<<std::endl;
+                std::cout<<"Stage increased by one"<<std::endl;
                 pipeline[i].second = Times[i][pipeline[i].first.second-1];
+                std::cout << "Input form Times for the Latency of the instructions " << std::endl;
             }
             else if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && stall)
             {
-               
+               std::cout << "Times == 0 & Stage: 1|2 & Stall == true" << std::endl;
             }
             else if(pipeline[i].second==0 && (pipeline[i].first.second==1||pipeline[i].first.second==2) && !stall && !isRAWHarzad)
             {
+                std::cout << "Times == 0 & Stage: 1|2 & No Stall & No Hazard" << std::endl;
                 pipeline[i].first.second++;
-                std::cout<<"i12 "<<i<<" "<<Times.size()<<std::endl;
+                std::cout<<"Stage increased by one; Times.size(): " << Times.size()<<std::endl;
                 pipeline[i].second = Times[i][pipeline[i].first.second-1];
-                std::cout<<"i14"<<std::endl;
+                std::cout << "Input appropriate latency" << std::endl;
             }
             else if(isRAWHarzad && pipeline[i].first.second==2)
             {
-                std::cout<<"HI LOOP "<<std::endl;
+                std::cout<<"There is a Raw Hazard & Stage == 2"<<std::endl;
                 int k1 =0;
                 int n1 = pipeline.size();
                 auto it = pipeline.begin();
@@ -272,70 +345,94 @@ class Core{
                     k1++;
                     it++;
                 }
+                std::cout << "Found appropriate position: " << std::endl;
                 pipeline.insert(it,{{-1,-1},-1});
                 Times.insert(Times.begin()+k1,{1,1,1,1,1});
+                std::cout << "Added stall into the pipeline, with proper times, break from loop" << std::endl;
                 break;
             }
         }
-        std::cout<<"i9"<<std::endl;
         if(stall)
         {
+            std::cout << "Stall is true: increased the count " << std::endl;
             NumOfStalls++;
         }
         else
         {
+            std::cout << "No Stall" << std::endl;
             if(BranchTaken)
             {
-                
+                std::cout << "Branch Taken is true" << std::endl;
                 if(isRAWHarzad)
                 {
+                    std::cout << "Hazard is true" << std::endl;
                     if(pipeline.back().first.second ==1)
                     {
+                        std::cout << "Last instruction back: pop out if it Stage = 1" << std::endl;
                         pipeline.pop_back();
                         Times.pop_back();
                     }
                     if(pipeline.back().first.second ==2)
                     {
+                        std::cout << "Last instruction back: pop out if it Stage = 2" << std::endl;
                         pipeline.pop_back();
                         Times.pop_back();
                     }
+                    std::cout << "We have flushed out the last instructions" << std::endl;
                     isRAWHarzad = false;
+                    std::cout << "Raw Hazard is made false" << std::endl;
                 }
                 else
                 {
+                    std::cout << "Hazard is false "<< std::endl;
                     if(pipeline.back().first.second ==2)
                     {
+                        std::cout << "Stage == 2 : Removed" <<std::endl;
                         pipeline.pop_back();
                         Times.pop_back();
                     }
                     if(pipeline.back().first.second ==3)
                     {
+                        std::cout << "Stage == 3 : Removed" <<std::endl;
                         pipeline.pop_back();
                         Times.pop_back();
                     }
-                    if(!inUseRegisters.empty())inUseRegisters.pop_back();
-
+                    if(!inUseRegisters.empty())
+                    {
+                        inUseRegisters.pop_back();
+                        std::cout << "InUsed Register is poped back" <<std::endl;
+                    }
                 }
-
+                std::cout << "Pushed two Stalls" << std::endl;
                 pipeline.push_back({{-1,-1},-1});
                 pipeline.push_back({{-1,-1},-1});
                 Times.push_back({1,1,1,1,1});
                 Times.push_back({1,1,1,1,1});
+                std::cout << "Setting pc: " << programCounter <<" to nextPC: " << nxtPC << std::endl; 
                 programCounter = nxtPC;
                 //pipeline.push_back({{programCounter,1},1});
+                std::cout << "BranchTaken is made false" << std::endl;
                 BranchTaken = false;
                 //NumOfStalls+=2;
             }
             else
             {
-                
-                if(!isRAWHarzad && programCounter<=insType.size() )programCounter++;
-               // pipeline.push_back({{programCounter,1},1});
-                
+                std::cout << "BranchTaken is false " << std::endl;
+                if(!isRAWHarzad && programCounter<=insType.size() )
+                {
+                    programCounter++;
+                    std::cout << "No Hazard, PC <= total" << std::endl;
+                }// pipeline.push_back({{programCounter,1},1});
             }
         }
-        std::cout<<"i10"<<std::endl;
-        std::cout<<"stalls is "<<NumOfStalls<<std::endl;
+        std::cout<<"Stall Count: "<<NumOfStalls<<std::endl;
+        std::cout << "After Making Changes: " << std::endl;
+        std::cout << "--------------------------------------------------------------------------------------------------" << std::endl;
+        for(auto x: pipeline)
+        {
+            std::cout << "PC: " << x.first.first <<" Stage: " << x.first.second << "Times: " << x.second << std::endl;
+        }
+        std::cout << "--------------------------------------------------------------------------------------------------" << std::endl;
         printRegisters();
         std::cout << "------------------------------------------------------------------------------------------------------" << std::endl;
         for(int i=0;i<32;i++)
@@ -348,21 +445,21 @@ class Core{
         return 1;
     }
 
-    void loadWord(int address, std::vector<Token> LineTokens, int8_t memory[])
-    {
-        int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
-        registers[std::stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))] = value;
-    }
+    // void loadWord(int address, std::vector<Token> LineTokens, int8_t memory[])
+    // {
+    //     int value = (int)memory[address]+(256*(int)memory[address+1])+(65536*(int)memory[address+2])+(16777216*(int)memory[address+3]);
+    //     registers[std::stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))] = value;
+    // }
 
-    void storeWord(int address, std::vector<Token> LineTokens, int8_t memory[])
-    {
-        uint8_t *po;
-        po = (uint8_t*)&registers[std::stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))];
-        for(int i =0;i<4;i++)
-        {
-            memory[address+i] = *(po+i);
-        }
-    }
+    // void storeWord(int address, std::vector<Token> LineTokens, int8_t memory[])
+    // {
+    //     uint8_t *;
+    //     po = (uint8_t*)&registers[std::stoi(LineTokens[1].Name.substr(1,LineTokens[1].Name.length()-1))];
+    //     for(int i =0;i<4;i++)
+    //     {
+    //         memory[address+i] = *(po+i);
+    //     }
+    // }
     
     void printDataLabels()
     {
@@ -426,6 +523,14 @@ class Core{
         }
          else if(instructType=="SBtype")
         {
+            std::cout << "*********************************************" << std::endl;
+            std::map<int, SBType>::iterator it = sbtype.begin();
+            while(it != sbtype.end())
+            {
+                std::cout << "key: " << it->first << "value: " << it->second.opcode << " " << it->second.src1 << " " << it->second.src2 << std::endl;
+                it++;
+            }
+            std::cout << "*********************************************" << pc << std::endl;
             result.push_back((sbtype[pc].opcode));
             result.push_back(std::to_string(sbtype[pc].src1));
             result.push_back(std::to_string(sbtype[pc].src2));
@@ -848,7 +953,7 @@ class Core{
         }
         else if(exResults.at(0) == "sw")
         {
-            std::cout<<" I came "<<std::endl;
+            std::cout << "-------------------------------**************************-------------------" << std::endl;
             uint8_t *po;
             if(this->dataForward)
             {
@@ -862,6 +967,7 @@ class Core{
             for(int i =0;i<4;i++)
             {
                 memory[address+i] = *(po+i);
+                std::cout << "Address: " << address+i << "Value: " << (int)*(po+i) << std::endl;  
             }
             memResults.first = "-1";
             memResults.second = "-1";

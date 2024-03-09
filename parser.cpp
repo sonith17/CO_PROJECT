@@ -49,7 +49,6 @@ class parser
         int offset = 0;
         for (int i = 1; i <= ProgramTokens.size(); i++)
         {
-        //std::cout<<i<<" klj"<<" "<<ProgramTokens[i-1].size()<<ProgramTokens[i-1].at(0).Name<<std::endl;
             std::vector<Token> line = ProgramTokens[i - 1];
             if (line[0].Name[line[0].Name.length() - 1] == ':' && line.size() == 1)
             {
@@ -107,7 +106,6 @@ class parser
 
             else if (instrMap[line[0].Name] == "Itype")
             {
-            //    std::cout<<"hjk "<<std::endl;
                 if(line[0].Name=="lw")
                 {
                     IType instruction(line[0].Name, timeMap[line[0].Name][0],
@@ -191,7 +189,6 @@ class parser
             }
             else if (line[0].Name == "j")
             {
-                //std::cout<<"s is "<<line[0].Name<<" "<<line[1].Name<<std::endl;
                 UJ1Type instruction("jal", timeMap["jal"][0],
                                    timeMap["jal"][1],
                                    timeMap["jal"][2],
@@ -199,7 +196,6 @@ class parser
                                    timeMap["jal"][4],
                                    0,
                                    0);
-                                  // std::cout<<"s1 is "<<line.size()<<std::endl;
                 jLabels.insert({i + offset, line[1].Name});
                 ujtype.insert({i + offset, instruction});
                 insType.insert({i + offset, "UJ1type"});
@@ -211,6 +207,8 @@ class parser
             ujtype[it->first].immed = immed;
         }
     }
+
+
     std::vector<std::vector<Token>> tokenization(std::vector<std::string> Program)
     {
         int lineNumber = 1;
@@ -226,6 +224,9 @@ class parser
         }
         return ProgramTokens;
     }
+
+
+    
     void getData(int8_t memory[], std::vector<std::string> &Program, std::map<std::string, DataToken> &dataLabels)
     {
         if (isData(Program.at(0)))
@@ -255,8 +256,3 @@ class parser
         
     }
 };
-
-// int main()
-// {
-//     std::cout << "HI";
-// }

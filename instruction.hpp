@@ -89,6 +89,9 @@ class SBType :  public instruction
     }
     SBType(std::string opcode,int IF_t,int ID_t,int EX_t,int MEM_t,int WB_t,int src1,int src2,std::string label) : instruction(opcode,IF_t,ID_t,EX_t,MEM_t,WB_t)
     {
+        std::cout << "#################################################################" <<std::endl;
+        std::cout << opcode << " " << src1 << src2 << label <<std::endl;
+        std::cout << "#################################################################" <<std::endl;
         this->src1 = src1;
         this->src2 = src2;
         this->label = label;
