@@ -4,7 +4,7 @@ base: .word 0x00000100
 str: .string "After Sort\n" 
 str1: .string " a" #hi
 .text
- addi x16 x0 256
+lw x16 base
  addi x25 x0 21
  addi x26 x0 -1
  outer_loop:

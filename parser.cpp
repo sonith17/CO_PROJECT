@@ -96,7 +96,7 @@ class parser
                                   timeMap[line[0].Name][3],
                                   timeMap[line[0].Name][4],
                                   std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)),
-                                  labels[line[2].Name],
+                                  dataLabels[line[2].Name].address,
                                   std::stoi(line[1].Name.substr(1, line[1].Name.length() - 1)));
 
                 itype.insert({i + offset+1, instruction1});

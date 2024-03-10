@@ -122,5 +122,7 @@ int main(int argc, char* argv[])
     Processor.printMemory();
 
     std::cout << "Instructions per Cycles(Core1): " << ((double)(Processor.cores[0].instructions)) / (double)(Processor.clock_core1-1) << std::endl;
+    std::cout << "Instructions , Clocks " << ((double)(Processor.cores[0].instructions)) <<" "<< (double)(Processor.clock_core1-1) << std::endl;
     std::cout << "Instructions per Cycles(Core2): " << ((double)(Processor.cores[1].instructions)) / (double)(Processor.clock_core2-1) << std::endl;
+    std::cout << "Instructions , Clocks " << ((double)(Processor.cores[1].instructions)) <<" "<< (double)(Processor.clock_core2-1) << std::endl;
 }

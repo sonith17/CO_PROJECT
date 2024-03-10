@@ -513,6 +513,7 @@ class Core{
             result.push_back((utype[pc].opcode));
             result.push_back(std::to_string(utype[pc].dest));
             result.push_back(std::to_string(utype[pc].immed));
+            toBeUsedRegisters = {utype[pc].dest,{-1,-1}};
         }
         else if(instructType=="UJ1type")
         {
