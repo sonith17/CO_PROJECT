@@ -982,5 +982,10 @@ class Core{
         }
         
     }
+
+    bool PredictBranch(int pc)
+    {
+        return false;
+    }
    
 };
