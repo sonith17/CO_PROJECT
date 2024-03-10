@@ -8,7 +8,7 @@ Welcome to the Read Me file for the development of our RISC-V Dual Core Processo
 We are currently engaged in the development of a RISC-V Dual Core Processor. The RISC-V architecture offers an open standard instruction set architecture (ISA), providing flexibility and scalability for various computing needs. This processor design focuses simulation of the RISC-V architecture.
 
 #### -End of Phase2-----
-## Minutes of the meeting(16th Meeting)
+## Minutes of the meeting(17th Meeting)
 Date: 10th March 2024
 
 Members: Venkat Kaushal, Sonith
@@ -19,7 +19,7 @@ Completions:
 3. Removing Debugging Statements.
 .
 
-## Minutes of the meeting(15th Meeting)
+## Minutes of the meeting(16th Meeting)
 Date: 9th March 2024
 
 Members: Venkat Kaushal, Sonith
