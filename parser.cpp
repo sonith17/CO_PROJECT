@@ -249,10 +249,9 @@ class parser
         {
             Program.erase(Program.begin());
         }
-        for (size_t i = 0; i < Program.size(); i++)
-        {
-            std::cout<<Program[i]<<std::endl;
-        }
-        
+        // for (size_t i = 0; i < Program.size(); i++)
+        // {
+        //     std::cout<<Program[i]<<std::endl;
+        // }
     }
 };

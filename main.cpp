@@ -4,6 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include <map>
+#include <algorithm>
 #include "./processor.cpp"
 #include "./parser.cpp"
 
@@ -15,6 +16,47 @@ int main(int argc, char* argv[])
 {
     processor Processor;
     std::vector<std::string> FilePaths;
+
+    std::map<std::string, std::vector<int>> timeMap;
+    std::vector<std::string> ins={"add","sub","or","and","xor","slt","srl","sll","addi","subi","ori","andi","xori","slti","srli","slli","jalr","lw",
+                                "sw","beq","bne","blt","bge","auipc","jal"};
+
+    std::cout << "Do you want to Manually set the Latency for instructions(YES/NO): " << std::endl;
+    std::string user_input;
+    std::cin >> user_input;
+    transform(user_input.begin(), user_input.end(), user_input.begin(), ::toupper);
+    if(user_input == "YES")
+    {
+        for(std:: string str: ins)
+        {
+            std::cout << "Enter latency for " << str << " :" ;
+            int input;
+            std::cin >> input;
+            timeMap[str] = {1,1,input,1,1};
+        }
+    }
+    else
+    {
+        for(std:: string str: ins)
+        {
+            timeMap[str] = {1,1,1,1,1};
+        }
+    }
+    std::cout << "DataForwarding(Enable/Disable): " << std::endl;
+    std::cin >> user_input;
+    transform(user_input.begin(), user_input.end(), user_input.begin(), ::toupper);
+    if(user_input == "ENABLE")
+    {
+        Processor.cores[0].dataForward = true;
+        Processor.cores[1].dataForward = true;
+    }
+    else
+    {
+        Processor.cores[0].dataForward = false;
+        Processor.cores[1].dataForward = false;
+    }
+
+
     for(int i=1;i<argc;i++)
     {
         FilePaths.push_back(argv[i]);
@@ -38,17 +80,8 @@ int main(int argc, char* argv[])
         while (std::getline(inputFile, line)) {
             Program.push_back(line);
         }
-        std::map<std::string, std::vector<int>> timeMap;
-        std::vector<std::string> ins={"add","sub","or","and","xor","slt","srl","sll","addi","subi","ori","andi","xori","slti","srli","slli","jalr","lw",
-                                 "sw","beq","bne","blt","bge","auipc","jal"};
-        std::cout << "Latency from user needs to be taken" << std::endl;
-        for(std:: string str: ins)
-        {
-            timeMap[str] = {1,1,2,1,1};
-        }
-        std::cout << "Latency from the user has been taken" << std::endl;
+
         parser p;
-        std::cout << "The Program has started it's parsing" << std::endl;
         if(i==0){
         p.parse(Processor.memory1,Program,
         Processor.cores[i].insType,
@@ -76,26 +109,18 @@ int main(int argc, char* argv[])
         Processor.cores[i].labels,
         timeMap);
         }
-        std::cout<<"The Program has completed the parsing the instructions"<<std::endl;
     }
-    // int x;
-    // std::cin>>x;
-    // std::cout<<"Enter x\n";
-    // while(x!=-1)
-    // {
-    //     Processor.run();
-    //     std::cout<<"Enter x\n";
-    //     std::cin>>x;
-    // }
     Processor.run();
-    Processor.cores[0].printDataLabels();
-    Processor.cores[1].printDataLabels();
-    Processor.cores[0].printLabels();
-    Processor.cores[1].printLabels();
+    // Processor.cores[0].printDataLabels();
+    // Processor.cores[1].printDataLabels();
+    // Processor.cores[0].printLabels();
+    // Processor.cores[1].printLabels();
     std::cout << "Register Contents: " << std::endl;
     Processor.cores[0].printRegisters();
     Processor.cores[1].printRegisters();
     std::cout << "Memory Contents:" << std::endl;
     Processor.printMemory();
-    std::cout<<Processor.clock<<std::endl;
+
+    std::cout << "Instructions per Cycles(Core1): " << ((double)(Processor.cores[0].instructions)) / (double)(Processor.clock_core1-1) << std::endl;
+    std::cout << "Instructions per Cycles(Core2): " << ((double)(Processor.cores[1].instructions)) / (double)(Processor.clock_core2-1) << std::endl;
 }
