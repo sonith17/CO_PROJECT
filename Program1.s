@@ -1,12 +1,10 @@
 .data
 array: .word 0x12f 0x12c 0x13 0x12 0x11 0x10 0xf 0xe 0xd 0xc 0xb 0xa 0x9 0x8 0x7 0x6 0x5 0x4 0x3 0x2 0x1
-base: .word 0x00000100
-str: .string "After Sort\n" 
-str1: .string " a" #hi
+base: .word 0x00000100 #jfdbvj
 .text
 lw x16 base
  addi x25 x0 21
- addi x26 x0 -1
+ addi x26 x0 -1 #jfdgjd
  outer_loop:
      addi x26 x26 1
      beq x25 x26 exit
@@ -30,5 +28,6 @@ lw x16 base
              j inner_loop                
 exit:
     addi x31 x16 0
+    addi x20 x20 -24
 
 
