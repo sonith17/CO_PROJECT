@@ -1,14 +1,14 @@
 import pandas as pd
 import re
 
-def get12_bit(num):
+def get12_bit(num,bits=12):
     if(num>=0):
-        return bin(num)[2:].zfill(12)
+        return bin(num)[2:].zfill(bits)
     else:
         s=""
         num = -num
         tf = True
-        for i in range(12):
+        for i in range(bits):
             if(num&1==0 and tf ):
                 s ='0'+s
             elif(num&1==1 and tf):
@@ -24,6 +24,40 @@ def get12_bit(num):
 
 
 class Parser:
+    labels = {}
+
+
+    @classmethod
+    def prerun(cls,instructions):
+        offset =0
+        i = 0
+        instruction = []
+        while i!=len(instructions):
+            ins = re.split(r',\s*|\s+', instructions[i])
+            print('prerun ',ins)
+            if len(ins)==1 and ins[0].endswith(':'): #check for labels
+                cls.labels[ins[0][:-1]] = i+offset
+                i +=1
+                offset -=1
+
+            elif len(ins)>1 and ins[0].endswith(':'):
+                cls.labels[ins[0][:-1]] = i+offset
+                ins.pop(0)
+                instruction.append(ins)
+                i+=1
+                if ins[0]=='lw' and len(ins)==3:
+                    offset+=1
+            else:
+                instruction.append(ins)
+                i+=1
+            if ins[0]=='lw' and ins[2][0:1].isalpha():
+                    print('hit is',ins)
+                    offset+=1
+        
+        print(cls.labels)
+        #print(instruction)
+        return instruction
+
 
     @classmethod
     def parse(cls,memory,instruction):
@@ -32,7 +66,6 @@ class Parser:
         insStoreAddress = 0
         pc = 0
         dataLabels = {}
-        labels = {}
         memPointer = 1024
         if(instruction[0]=='.data'):
             while True:
@@ -58,15 +91,10 @@ class Parser:
         instruction.pop(0)
         instruction.pop(0)
         print(instruction)
+        instruction = cls.prerun(instruction)
         while len(instruction)!=0 :
-            ins = re.split(r',\s*|\s+', instruction[0])
+            ins = instruction[0]
             instruction.pop(0) #getting instruction for parse
-            if len(ins)==1 and ins[0].endswith(':'): #check for labels
-                labels[ins[0][:-1]] = pc
-                continue
-            elif len(ins)>1 and ins[0].endswith(':'):
-                labels[ins[0][:-1]] = pc
-                ins.pop(0)
             df2 = df[df['Instruction']==ins[0]]  #nxt 3 get details for that instruction
             print(df2) 
             df2 = df2.iloc[0]
@@ -82,7 +110,7 @@ class Parser:
                 for i in range(4):
                     memory[insStoreAddress+i]=store[i]
                 insStoreAddress += 4
-                pc = insStoreAddress -4
+                pc = insStoreAddress 
             
             elif (df2['Type']=='I-Type') and (ins[0]!='lw'):
                 src1 = str(bin(int(ins[2][1:]) & 31))[2:].zfill(5)
@@ -98,7 +126,28 @@ class Parser:
                 for i in range(4):
                     memory[insStoreAddress+i]=store[i]
                 insStoreAddress += 4
-                pc = insStoreAddress -4
+                pc = insStoreAddress 
+
+
+
+            elif (df2['Type']=='I-Type') and (ins[0]=='lw') and (not ins[2][0:1].isalpha()):
+                dest = str(bin(int(ins[1][1:]) & 31))[2:].zfill(5)
+                immed,src1 = ins[2].split('(')
+                src1 = str(bin(int(src1[1:-1]) & 31))[2:].zfill(5)
+                immed = get12_bit(int(immed))
+                print('lw prop',dest,immed,src1)
+                instr = immed+src1+ str(int(df2['Func3'])).zfill(3)+dest+str(int(df2['Opcode'])).zfill(7)
+                print("instr ",instr)
+                hexrep = hex(int(instr,2))
+                print(hexrep)
+                instrVal = int(instr,2)
+                store = [(instrVal >> (i * 8)) & 0xFF for i in range(4)]
+                for i in range(4):
+                    memory[insStoreAddress+i]=store[i]
+                insStoreAddress += 4
+                pc = insStoreAddress 
+
+
 
             elif df2['Type']=='S-Type':
                 src1 = str(bin(int(ins[1][1:]) & 31))[2:].zfill(5)
@@ -114,5 +163,51 @@ class Parser:
                 for i in range(4):
                     memory[insStoreAddress+i]=store[i]
                 insStoreAddress += 4
-                pc = insStoreAddress -4
-                print('pc is ',pc)
+                pc = insStoreAddress 
+                
+            elif df2['Type']=='SB-Type':
+                src1 = str(bin(int(ins[1][1:]) & 31))[2:].zfill(5)
+                src2 = str(bin(int(ins[2][1:]) & 31))[2:].zfill(5)
+                immed = get12_bit(cls.labels[ins[3]]*4 - pc,bits=13)
+                print(len(immed))
+                instr = immed[0]+immed[2:8]+src2+src1+str(int(df2['Func3'])).zfill(3)+immed[8:12]+immed[1]+str(int(df2['Opcode'])).zfill(7)
+                print("instr(sb) ",instr,pc)
+                hexrep = hex(int(instr,2))
+                print(hexrep)
+                instrVal = int(instr,2)
+                store = [(instrVal >> (i * 8)) & 0xFF for i in range(4)]
+                for i in range(4):
+                    memory[insStoreAddress+i]=store[i]
+                insStoreAddress += 4
+                pc = insStoreAddress 
+
+            elif df2['Type']=='UJ-Type':
+                if ins[0]=='jal':
+                    dest =  str(bin(int(ins[1][1:]) & 31))[2:].zfill(5)
+                    immed = get12_bit(cls.labels[ins[2]]*4 - pc,bits=21)
+                    instr = immed[0]+immed[10:20]+immed[9]+immed[1:9]+dest+str(int(df2['Opcode'])).zfill(7)
+                    print("instr(sb) ",instr,pc)
+                    hexrep = hex(int(instr,2))
+                    print(hexrep)
+                    instrVal = int(instr,2)
+                    store = [(instrVal >> (i * 8)) & 0xFF for i in range(4)]
+                    for i in range(4):
+                        memory[insStoreAddress+i]=store[i]
+                    insStoreAddress += 4
+                    pc = insStoreAddress
+                if ins[0]=='j':
+                    dest =  '00000'
+                    immed = get12_bit(cls.labels[ins[1]]*4 - pc,bits=21)
+                    instr = immed[0]+immed[10:20]+immed[9]+immed[1:9]+dest+str(int(df2['Opcode'])).zfill(7)
+                    print("instr(sb) ",instr,pc)
+                    hexrep = hex(int(instr,2))
+                    print(hexrep)
+                    instrVal = int(instr,2)
+                    store = [(instrVal >> (i * 8)) & 0xFF for i in range(4)]
+                    for i in range(4):
+                        memory[insStoreAddress+i]=store[i]
+                    insStoreAddress += 4
+                    pc = insStoreAddress
+                
+
+
