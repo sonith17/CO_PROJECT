@@ -208,6 +208,8 @@ class Parser:
                         memory[insStoreAddress+i]=store[i]
                     insStoreAddress += 4
                     pc = insStoreAddress
+            
+        return pc-4
                 
 
 
