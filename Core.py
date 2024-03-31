@@ -154,20 +154,16 @@ class Core:
             return executed,currPc+4
         
         elif decoded[0]=='beq':
-            executed.append(decoded[1])
-            currPc = currPc+decoded[3] if cls.registers[decoded[2]]==cls.registers[decoded[3]] else currPc+4
+            currPc = currPc+decoded[3] if cls.registers[decoded[1]]==cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='bne':
-            executed.append(decoded[1])
-            currPc = currPc+decoded[3] if cls.registers[decoded[2]]!=cls.registers[decoded[3]] else currPc+4
+            currPc = currPc+decoded[3] if cls.registers[decoded[1]]!=cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='blt':
-            executed.append(decoded[1])
-            currPc = currPc+decoded[3] if cls.registers[decoded[2]]<cls.registers[decoded[3]] else currPc+4
+            currPc = currPc+decoded[3] if cls.registers[decoded[1]]< cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='bge':
-            executed.append(decoded[1])
-            currPc = currPc+decoded[3] if cls.registers[decoded[2]]>=cls.registers[decoded[3]] else currPc+4
+            currPc = currPc+decoded[3] if cls.registers[decoded[1]]>=cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         
         elif decoded[0]=='jal':
