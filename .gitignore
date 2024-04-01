@@ -2,3 +2,4 @@ main.out
 c_cpp_properties.json
 settings.json
 __pycache__
+processor_state.txt

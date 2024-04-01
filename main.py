@@ -34,7 +34,19 @@ print(processor.memory1[1023:])
 for x in range(0,pc1+1,4):
     print(processor.memory1[x]," ",processor.memory1[x+1]," ",processor.memory1[x+2]," ",processor.memory1[x+3],"\n")
 
+
+# x1 = int(input())
+# while(x1!=-1):
+#     processor.run1(latencies,end_pc1=pc1,end_pc2=pc1)
+#     x1 = int(input())
 processor.run(latencies,end_pc1=pc1,end_pc2=pc1)
+
+
+for x in range(1023,2043,4):
+    print(processor.memory1[x]," ",processor.memory1[x+1]," ",processor.memory1[x+2]," ",processor.memory1[x+3],"\n")
+
+print(processor.clock1)
+print(processor.Core1.instructionExecuted)
 
 # with open(file2,'r') as file:
 #     for line in file:

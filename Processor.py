@@ -15,11 +15,27 @@ class Processor:
     def run(cls,latencies,end_pc1,end_pc2):
         t,t1=True,False
         while t1 or t:
-            t = cls.Core1.test(end_pc1,cls.memory1)
+            print(cls.clock)
+            with open("processor_state.txt", "a") as file:
+              file.write(f"cls.clock: {cls.clock}\n")
+              file.close()
+            t = cls.Core1.run(cls.memory1,latencies,end_pc1)
             #t1 = cls.Core2.run(cls.memory2,latencies,end_pc2)
             if t==0:
                 cls.clock1=cls.clock
             # if t1==0:
             #     cls.clock2=cls.clock
             cls.clock+=1
+
+    def run1(cls,latencies,end_pc1,end_pc2):
+        # t,t1=True,False
+        # while t1 or t:
+        print(cls.clock)
+        t = cls.Core1.run(cls.memory1,latencies,end_pc1)
+        #t1 = cls.Core2.run(cls.memory2,latencies,end_pc2)
+        if t==0:
+            cls.clock1=cls.clock
+        # if t1==0:
+        #     cls.clock2=cls.clock
+        cls.clock+=1
     
