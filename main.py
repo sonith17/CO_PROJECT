@@ -2,7 +2,7 @@ from Parser import Parser
 from Processor import Processor
 import re
 
-file1 = 'Program1.s'
+file1 = 'Program2.s'
 file2 = 'Program2.s'
 
 instructionsProgram1 = []
@@ -29,10 +29,13 @@ p = Parser()
 
 pc1 = p.parse(memory=(processor.memory1),instruction=instructionsProgram1)
 
-print(processor.memory1[1023:])
+print(processor.memory1[1024:])
 
 for x in range(0,pc1+1,4):
     print(processor.memory1[x]," ",processor.memory1[x+1]," ",processor.memory1[x+2]," ",processor.memory1[x+3],"\n")
+
+
+print("-------------------------------------------------------------------------------------------------------")
 
 
 # x1 = int(input())

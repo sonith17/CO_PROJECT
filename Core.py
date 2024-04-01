@@ -86,6 +86,12 @@ class Core:
             file.write(f"cls.ID_output: {cls.ID_output}\n")
             file.write(f"cls.EXE_output: {cls.EXE_output}\n")
             file.write(f"cls.MEM_output: {cls.MEM_output}\n")
+            file.write(f"registers: {cls.registers}\n")
+            file.write(f"memory:{memory[1024]}\n")
+            file.write(f"memory:{memory[1025]}\n")
+            file.write(f"memory:{memory[1026]}\n")
+            file.write(f"memory:{memory[1027]}\n")
+            file.write(f"memory:{memory[1028]}\n")
             file.write(f"-----------------------------------------------------------------------------------------------------\n\n\n")
             file.close()
 
@@ -108,7 +114,7 @@ class Core:
                 for ind in range(len(cls.registerInUse)):
                     if ind < len(cls.registerInUse):  # Check if ind is within the valid range
                         wr, src1, src2 = cls.registerInUse[ind]
-                        if wr in cls.ID_output[2:] and wr != -1:
+                        if wr in cls.toBeUsedRegisters[1:] and wr != -1:
                             cls.harzad = True
                             break
                         else:
@@ -431,8 +437,9 @@ class Core:
             return executed
     
     def WB(cls,memorised):
-        if memorised:
+        if memorised and memorised[0]!=0:
             cls.registers[memorised[0]]=memorised[1]
+        cls.registers[0]=0
         cls.registerInUse.pop(0)
         return
 
