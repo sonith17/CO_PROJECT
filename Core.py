@@ -162,7 +162,6 @@ class Core:
         
         if(cls.pipeline[0][1]==5 and cls.pipeline[0][2]==0):
             cls.pipeline.pop(0)
-            cls.registerInUse.pop(0)
             cls.instructionExecuted+=1
 
 
@@ -434,6 +433,7 @@ class Core:
     def WB(cls,memorised):
         if memorised:
             cls.registers[memorised[0]]=memorised[1]
+        cls.registerInUse.pop(0)
         return
 
 
