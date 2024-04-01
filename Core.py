@@ -13,6 +13,7 @@ def twos_complement_binary_to_int(binary_str):
 class Core:
     pc = 0
     registers = np.zeros(32, dtype=np.int32)
+    tempRegisters = np.zeros(32, dtype=np.int32)
     instructionExecuted = 0
     stalls = 0
     pipeline = []
@@ -36,10 +37,12 @@ class Core:
     stalled_at_WB = False
     branchTaken = False
     harzad = False
+    dataForward = False
 
 
     @classmethod
-    def run(cls,memory,instructionLatencies,end_pc):
+    def run(cls,memory,instructionLatencies,end_pc,dataForward):
+        cls.dataForward = dataForward
         if(cls.pipeline or cls.pc<=end_pc):
             if (cls.pc <= end_pc) and (not cls.stalled_at_IF) and (not cls.stalled_at_ID) and (not cls.stalled_at_EXE)and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB) and(not cls.harzad):
                 cls.pipeline.append([cls.pc,1,1])
@@ -87,6 +90,7 @@ class Core:
             file.write(f"cls.EXE_output: {cls.EXE_output}\n")
             file.write(f"cls.MEM_output: {cls.MEM_output}\n")
             file.write(f"registers: {cls.registers}\n")
+            file.write(f"tempregisters: {cls.tempRegisters}\n")
             file.write(f"memory:{memory[1024]}\n")
             file.write(f"memory:{memory[1025]}\n")
             file.write(f"memory:{memory[1026]}\n")
@@ -124,8 +128,14 @@ class Core:
                 if len(cls.registerInUse) ==0:
                     cls.harzad=False
 
-                if not cls.harzad:
+                if not cls.harzad and not cls.dataForward:
                     cls.registerInUse.append(cls.toBeUsedRegisters)
+                if not cls.harzad and cls.dataForward:
+                    if cls.ID_output[0]=='lw':
+                        cls.registerInUse.append(cls.toBeUsedRegisters)
+                    else:
+                        cls.registerInUse.append([-1,-1,-1])
+
                 if (i[2]==0) and (not cls.harzad) and (not cls.stalled_at_EXE)  and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
                     cls.EXE_input=cls.ID_output
                     cls.stalled_at_ID = False
@@ -177,11 +187,13 @@ class Core:
             cls.pipeline.append([-1,-1,-1])
             cls.pipeline.append([-1,-1,-1])
             cls.EXE_input.clear()
+            if(not cls.harzad) and not cls.dataForward:
+                cls.registerInUse.pop(len(cls.registerInUse)-1)
+            if(not cls.harzad) and cls.dataForward:
+                cls.registerInUse.pop(len(cls.registerInUse)-1)
             cls.ID_output.clear()
             cls.ID_input=""
             cls.IF_output=""
-            if(not cls.harzad):
-                cls.registerInUse.pop(len(cls.registerInUse)-1)
             cls.harzad = False
             cls.stalled_at_ID=False
             cls.stalled_at_IF=False
@@ -307,103 +319,165 @@ class Core:
         executed =[decoded[0]]
         if decoded[0]=='add':
             val = cls.registers[decoded[2]]+cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]+cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='sub':
             val = cls.registers[decoded[2]]-cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]-cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='or':
             val = cls.registers[decoded[2]]|cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]|cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='and':
             val = cls.registers[decoded[2]]&cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]&cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='xor':
             val = cls.registers[decoded[2]]^cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]^cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='slt':
             val = 1 if cls.registers[decoded[2]] < cls.registers[decoded[3]] else 0
+            if cls.dataForward:
+                val = 1 if cls.tempRegisters[decoded[2]] < cls.tempRegisters[decoded[3]] else 0
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='srl':
             val = cls.registers[decoded[2]] >> cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]>>cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='sll':
             val = cls.registers[decoded[2]] << cls.registers[decoded[3]]
+            if cls.dataForward:
+                val =cls.tempRegisters[decoded[2]]<<cls.tempRegisters[decoded[3]]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         
         elif decoded[0]=='addi':
             val = cls.registers[decoded[2]]+decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]+decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='ori':
             val = cls.registers[decoded[2]]|decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]|decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='andi':
             val = cls.registers[decoded[2]]&decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]&decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='xori':
             val = cls.registers[decoded[2]]^decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]^decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='slti':
             val = 1 if cls.registers[decoded[2]] < decoded[3] else 0
+            if cls.dataForward:
+                val = 1 if cls.tempRegisters[decoded[2]] < decoded[3] else 0
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='srli':
             val = cls.registers[decoded[2]] >> decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]>>decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='slli':
             val = cls.registers[decoded[2]] << decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]<<decoded[3]
+                cls.tempRegisters[decoded[1]] = val
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         
         elif decoded[0]=='lw':
             val = cls.registers[decoded[2]]+decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]+decoded[3]
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         elif decoded[0]=='sw':
             val = cls.registers[decoded[2]]+decoded[3]
+            if cls.dataForward:
+                val = cls.tempRegisters[decoded[2]]+decoded[3]
             executed.append(decoded[1])
             executed.append(val)
             return executed,currPc+4
         
         elif decoded[0]=='beq':
-            currPc = currPc+decoded[3] if cls.registers[decoded[1]]==cls.registers[decoded[2]] else currPc+4
+            
+            if cls.dataForward:
+                currPc = currPc+decoded[3] if cls.tempRegisters[decoded[1]]==cls.tempRegisters[decoded[2]] else currPc+4
+            else:
+                currPc = currPc+decoded[3] if cls.registers[decoded[1]]==cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='bne':
-            currPc = currPc+decoded[3] if cls.registers[decoded[1]]!=cls.registers[decoded[2]] else currPc+4
+            if cls.dataForward:
+                currPc = currPc+decoded[3] if cls.tempRegisters[decoded[1]]!=cls.tempRegisters[decoded[2]] else currPc+4
+            else:
+                currPc = currPc+decoded[3] if cls.registers[decoded[1]]!=cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='blt':
-            currPc = currPc+decoded[3] if cls.registers[decoded[1]]< cls.registers[decoded[2]] else currPc+4
+            if cls.dataForward:
+                currPc = currPc+decoded[3] if cls.tempRegisters[decoded[1]]<cls.tempRegisters[decoded[2]] else currPc+4
+            else:
+                currPc = currPc+decoded[3] if cls.registers[decoded[1]]<cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         elif decoded[0]=='bge':
-            currPc = currPc+decoded[3] if cls.registers[decoded[1]]>=cls.registers[decoded[2]] else currPc+4
+            if cls.dataForward:
+                currPc = currPc+decoded[3] if cls.tempRegisters[decoded[1]]>=cls.tempRegisters[decoded[2]] else currPc+4
+            else:
+                currPc = currPc+decoded[3] if cls.registers[decoded[1]]>=cls.registers[decoded[2]] else currPc+4
             return executed,currPc
         
         elif decoded[0]=='jal':
@@ -415,6 +489,8 @@ class Core:
             val = currPc+4
             executed.append(decoded[1])
             executed.append(val)
+            if cls.dataForward:
+                return executed,cls.tempRegisters[decoded[2]]+decoded[3]
             return executed,cls.registers[decoded[2]]+decoded[3]
         
     def MEM(cls,executed,memory):
@@ -426,21 +502,34 @@ class Core:
             val = twos_complement_binary_to_int(val)
             memorised.append(executed[1])
             memorised.append(val)
+            if cls.dataForward:
+                cls.tempRegisters[executed[1]]=val
+                if len(cls.registerInUse)>0:
+                    cls.registerInUse.pop(0)
             return memorised
         elif executed[0]=='sw':
-            store = [(cls.registers[executed[1]] >> (i * 8)) & 0xFF for i in range(4)]
+            store = [(cls.registers[executed[1]] >> (i * 8)) & 0xFF for i in range(4)] if (not cls.dataForward)  else [(cls.tempRegisters[executed[1]] >> (i * 8)) & 0xFF for i in range(4)]
             for i in range(4):
                 memory[executed[2]+i]=store[i]
+            if cls.dataForward:
+                if len(cls.registerInUse)>0:
+                    cls.registerInUse.pop(0)
             return []
         else:
             executed.pop(0)
+            if cls.dataForward:
+                if len(cls.registerInUse)>0:
+                    cls.registerInUse.pop(0)
             return executed
     
     def WB(cls,memorised):
-        if memorised and memorised[0]!=0:
+        if memorised and memorised[0]!=0 and(not cls.dataForward):
             cls.registers[memorised[0]]=memorised[1]
+        if memorised and memorised[0]!=0 and(cls.dataForward):
+            cls.registers[memorised[0]]=cls.tempRegisters[memorised[0]]
         cls.registers[0]=0
-        cls.registerInUse.pop(0)
+        if(not cls.dataForward):
+            cls.registerInUse.pop(0)
         return
 
 

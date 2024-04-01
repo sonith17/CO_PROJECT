@@ -5,6 +5,8 @@ import re
 file1 = 'Program2.s'
 file2 = 'Program2.s'
 
+dataForward = True
+
 instructionsProgram1 = []
 instructionsProgram2 = []
 
@@ -42,7 +44,7 @@ print("-------------------------------------------------------------------------
 # while(x1!=-1):
 #     processor.run1(latencies,end_pc1=pc1,end_pc2=pc1)
 #     x1 = int(input())
-processor.run(latencies,end_pc1=pc1,end_pc2=pc1)
+processor.run(latencies,end_pc1=pc1,end_pc2=pc1,dataForward=dataForward)
 
 
 for x in range(1023,2043,4):
