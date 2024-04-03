@@ -2,10 +2,10 @@ from Parser import Parser
 from Processor import Processor
 import re
 
-file1 = 'Program3.s'
+file1 = 'Program1.s'
 file2 = 'Program2.s'
 
-dataForward = False
+dataForward = True
 
 instructionsProgram1 = []
 instructionsProgram2 = []
@@ -15,7 +15,7 @@ instruct = ["add","sub","or","and","xor","slt","srl","sll","addi","subi","ori","
 latencies={}
 
 for x in instruct:
-    latencies[x]=[1,1,2,1,1]
+    latencies[x]=[1,1,1,1,1]
 
 
 processor = Processor()

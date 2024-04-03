@@ -113,7 +113,7 @@ class Core:
             if i[1]==1:
                 if i[2] > 0:
                     i[2] -= 1
-                if i[2]==0 and (not cls.stalled_at_ID) and(not cls.stalled_at_EXE) and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
+                if i[2]==0 and (not cls.stalled_at_ID) and(not cls.stalled_at_EXE) and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB) and (not cls.harzad):
                     cls.IF_output=cls.IF(cls=cls,pc_given=cls.IF_input,memory=memory)
                     cls.ID_input=cls.IF_output
                     cls.stalled_at_IF = False
@@ -124,35 +124,37 @@ class Core:
                     if i[2] > 0:
                         i[2] -= 1
         
-                    if (i[2]==0) and (not cls.harzad) and (not cls.stalled_at_EXE)  and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
-                        print("iiiiiiiiiiiiiii")
-                        cls.ID_output=cls.ID(cls,cls.ID_input)
-                        cls.pipelineLatency[i[0]]=instructionLatencies[cls.ID_output[0]]
-                        cls.EXE_input=cls.ID_output
-                        cls.stalled_at_ID = False
-                        for ind in range(len(cls.registerInUse)):
-                            if ind < len(cls.registerInUse):  # Check if ind is within the valid range
-                                wr, src1, src2 = cls.registerInUse[ind]
-                                if (wr != -1) and (wr in cls.toBeUsedRegisters[1:]):
-                                    print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-                                    cls.harzad = True
-                                    break
-                                else:
-                                    cls.harzad = False
+                if (i[2]==0) and (not cls.stalled_at_EXE)  and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
+                    print("iiiiiiiiiiiiiii")
+                    cls.ID_output=cls.ID(cls,cls.ID_input)
+                    cls.pipelineLatency[i[0]]=instructionLatencies[cls.ID_output[0]]
+                    cls.stalled_at_ID = False
+                    for ind in range(len(cls.registerInUse)):
+                        if ind < len(cls.registerInUse):  # Check if ind is within the valid range
+                            wr, src1, src2 = cls.registerInUse[ind]
+                            if (wr != -1) and (wr in cls.toBeUsedRegisters[1:]):
+                                print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                                cls.harzad = True
+                                break
                             else:
-                                print("Error: Index out of range - ind:", ind, "registerInUse length:", len(cls.registerInUse))
-                        if len(cls.registerInUse) ==0:
-                            cls.harzad=False
+                                cls.harzad = False
+                        else:
+                            print("Error: Index out of range - ind:", ind, "registerInUse length:", len(cls.registerInUse))
+                    if len(cls.registerInUse) ==0:
+                        cls.harzad=False
+                    
 
-                        if not cls.harzad and not cls.dataForward:
+                    if not cls.harzad and not cls.dataForward:
+                        cls.registerInUse.append(cls.toBeUsedRegisters)
+                        cls.EXE_input=cls.ID_output
+                    elif not cls.harzad and cls.dataForward:
+                        if cls.ID_output[0]=='lw':
                             cls.registerInUse.append(cls.toBeUsedRegisters)
-                        elif not cls.harzad and cls.dataForward:
-                            if cls.ID_output[0]=='lw':
-                                cls.registerInUse.append(cls.toBeUsedRegisters)
-                            else:
-                                cls.registerInUse.append([-1,-1,-7])
-                    else:
-                        cls.stalled_at_ID = True
+                        else:
+                            cls.registerInUse.append([-1,-1,-7])
+                        cls.EXE_input=cls.ID_output
+                else:
+                    cls.stalled_at_ID = True
             elif i[1]==3:
                 if i[2] > 0:
                     i[2] -= 1
@@ -237,6 +239,10 @@ class Core:
                     cls.pipeline[index][1]=3
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][2]
                 elif((cls.stalled_at_ID and (not isStallAdded)) and (not cls.harzad)):
+                    cls.pipeline.insert(index,[-1,-1,-8])
+                    isStallAdded =True
+                    index+=1
+                elif(( (not cls.stalled_at_ID) and (not isStallAdded)) and (cls.harzad)):
                     cls.pipeline.insert(index,[-1,-1,-8])
                     isStallAdded =True
                     index+=1
