@@ -41,12 +41,16 @@ class Core:
 
 
     @classmethod
+    def checkincache(cls,pc):
+        return 1
+    @classmethod
     def run(cls,memory,instructionLatencies,end_pc,dataForward):
         cls.dataForward = dataForward
         if(cls.pipeline or cls.pc<=end_pc):
             if (cls.pc <= end_pc) and (not cls.stalled_at_IF) and (not cls.stalled_at_ID) and (not cls.stalled_at_EXE)and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB) and(not cls.harzad):
-                cls.pipeline.append([cls.pc,1,1])
-                cls.pipelineLatency[cls.pc]=[1,1,1,1,1,1] #will be updated 
+                print("append", end_pc)
+                cls.pipeline.append([cls.pc,1,cls.checkincache(cls.pc)])
+                cls.pipelineLatency[cls.pc]=[1,1,1,1,1] #will be updated 
                 cls.IF_input=cls.pc
         else:
             return False
@@ -73,6 +77,7 @@ class Core:
         with open("processor_state.txt", "a") as file:
             file.write(f"cls.pipeline: {cls.pipeline}\n")
             file.write(f"cls.registerInUse: {cls.registerInUse}\n")
+            file.write(f"cls.toBeUsedRegisters: {cls.toBeUsedRegisters}\n")
             file.write(f"cls.harzad: {cls.harzad}\n")
             file.write(f"cls.stalled_at_IF: {cls.stalled_at_IF}\n")
             file.write(f"cls.stalled_at_ID: {cls.stalled_at_ID}\n")
@@ -99,81 +104,84 @@ class Core:
             file.write(f"-----------------------------------------------------------------------------------------------------\n\n\n")
             file.close()
 
+        while(cls.pipeline[0][0] == -1):
+            print("This should be taken32365488888888888888888888888888888888885")
+            cls.pipeline.pop(0)
+            cls.stalls+=1
 
         for i in cls.pipeline:
             if i[1]==1:
-                cls.IF_output=cls.IF(cls=cls,pc_given=cls.IF_input,memory=memory)
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not cls.stalled_at_ID) and(not cls.stalled_at_EXE) and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
+                    cls.IF_output=cls.IF(cls=cls,pc_given=cls.IF_input,memory=memory)
                     cls.ID_input=cls.IF_output
                     cls.stalled_at_IF = False
                 else:
-                    cls.stalled_at_IF = True
+                    cls.stalled_at_IF = True    
             elif i[1]==2:
-                cls.ID_output=cls.ID(cls,cls.ID_input)
-                cls.pipelineLatency[i[0]]=instructionLatencies[cls.ID_output[0]]
-                if i[2] > 0:
-                    i[2] -= 1
-                for ind in range(len(cls.registerInUse)):
-                    if ind < len(cls.registerInUse):  # Check if ind is within the valid range
-                        wr, src1, src2 = cls.registerInUse[ind]
-                        if wr in cls.toBeUsedRegisters[1:] and wr != -1:
-                            cls.harzad = True
-                            break
-                        else:
-                            cls.harzad = False
-                    else:
-                        print("Error: Index out of range - ind:", ind, "registerInUse length:", len(cls.registerInUse))
-                if len(cls.registerInUse) ==0:
-                    cls.harzad=False
+                if i[2] != 0:
+                    if i[2] > 0:
+                        i[2] -= 1
+        
+                    if (i[2]==0) and (not cls.harzad) and (not cls.stalled_at_EXE)  and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
+                        print("iiiiiiiiiiiiiii")
+                        cls.ID_output=cls.ID(cls,cls.ID_input)
+                        cls.pipelineLatency[i[0]]=instructionLatencies[cls.ID_output[0]]
+                        cls.EXE_input=cls.ID_output
+                        cls.stalled_at_ID = False
+                        for ind in range(len(cls.registerInUse)):
+                            if ind < len(cls.registerInUse):  # Check if ind is within the valid range
+                                wr, src1, src2 = cls.registerInUse[ind]
+                                if (wr != -1) and (wr in cls.toBeUsedRegisters[1:]):
+                                    print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                                    cls.harzad = True
+                                    break
+                                else:
+                                    cls.harzad = False
+                            else:
+                                print("Error: Index out of range - ind:", ind, "registerInUse length:", len(cls.registerInUse))
+                        if len(cls.registerInUse) ==0:
+                            cls.harzad=False
 
-                if not cls.harzad and not cls.dataForward:
-                    cls.registerInUse.append(cls.toBeUsedRegisters)
-                if not cls.harzad and cls.dataForward:
-                    if cls.ID_output[0]=='lw':
-                        cls.registerInUse.append(cls.toBeUsedRegisters)
+                        if not cls.harzad and not cls.dataForward:
+                            cls.registerInUse.append(cls.toBeUsedRegisters)
+                        elif not cls.harzad and cls.dataForward:
+                            if cls.ID_output[0]=='lw':
+                                cls.registerInUse.append(cls.toBeUsedRegisters)
+                            else:
+                                cls.registerInUse.append([-1,-1,-7])
                     else:
-                        cls.registerInUse.append([-1,-1,-1])
-
-                if (i[2]==0) and (not cls.harzad) and (not cls.stalled_at_EXE)  and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
-                    cls.EXE_input=cls.ID_output
-                    cls.stalled_at_ID = False
-                else:
-                    cls.stalled_at_ID = True
+                        cls.stalled_at_ID = True
             elif i[1]==3:
-                cls.EXE_output,nextPc=cls.EXE(cls,cls.EXE_input,i[0])
-                if nextPc-i[0]!=4:
-                    cls.branchTaken=True
-                    cls.pc = nextPc
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB):
+                    cls.EXE_output,nextPc=cls.EXE(cls,cls.EXE_input,i[0])
+                    if nextPc-i[0]!=4:
+                        cls.branchTaken=True
+                        cls.pc = nextPc
                     cls.MEM_input = cls.EXE_output
                     cls.stalled_at_EXE = False
                 else:
                     cls.stalled_at_EXE = True
             elif i[1] == 4:
-                cls.MEM_output=cls.MEM(cls,cls.MEM_input,memory)
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and not cls.stalled_at_WB:
+                    cls.MEM_output=cls.MEM(cls,cls.MEM_input,memory)
                     cls.WB_input=cls.MEM_output
                     cls.stalled_at_MEM = False
                 else:
                     cls.stalled_at_MEM = True
             elif i[1] == 5:
-                cls.WB(cls,cls.WB_input)
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0:
+                    cls.WB(cls,cls.WB_input)
                     cls.stalled_at_WB = False
                 else:
                     cls.stalled_at_WB = True
-
-        while(cls.pipeline[0][0]== -1):
-            cls.pipeline.pop(0)
-            cls.stalls+=1
 
         
         if(cls.pipeline[0][1]==5 and cls.pipeline[0][2]==0):
@@ -184,8 +192,8 @@ class Core:
         #need to update inuseregiter with,handle hazard,stalls due to var latencies.updatelatencies,promote to next stage
         if cls.branchTaken:  #assuming branch statements latency is one
             cls.pipeline = [row for row in cls.pipeline if row[1] not in [1, 2]] 
-            cls.pipeline.append([-1,-1,-1])
-            cls.pipeline.append([-1,-1,-1])
+            cls.pipeline.append([-1,-1,-2])
+            cls.pipeline.append([-1,-1,-3])
             cls.EXE_input.clear()
             if(not cls.harzad) and not cls.dataForward:
                 cls.registerInUse.pop(len(cls.registerInUse)-1)
@@ -203,7 +211,7 @@ class Core:
         while index < len(cls.pipeline):
             if(cls.pipeline[index][1]==5):
                 if(cls.stalled_at_WB):
-                    cls.pipeline.insert(index,[-1,-1,-1])
+                    cls.pipeline.insert(index,[-1,-1,-4])
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==4):
@@ -211,36 +219,40 @@ class Core:
                     cls.pipeline[index][1]=5
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][4]
                 elif(cls.stalled_at_MEM and (not isStallAdded)):
-                    cls.pipeline.insert(index,[-1,-1,-1])
+                    cls.pipeline.insert(index,[-1,-1,-5])
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==3):
-                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) :
+                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and cls.stalled_at_EXE:
+                    pass
+                elif(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) :
                     cls.pipeline[index][1]=4
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][3]
                 elif(cls.stalled_at_EXE and (not isStallAdded)):
-                    cls.pipeline.insert(index,[-1,-1,-1])
+                    cls.pipeline.insert(index,[-1,-1,-6])
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==2):
-                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad ) :
+                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad):
                     cls.pipeline[index][1]=3
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][2]
-                elif((cls.stalled_at_ID and (not isStallAdded))):
-                    cls.pipeline.insert(index,[-1,-1,-1])
+                elif((cls.stalled_at_ID and (not isStallAdded)) and (not cls.harzad)):
+                    cls.pipeline.insert(index,[-1,-1,-8])
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==1):
                 if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad ) and(not cls.stalled_at_ID) :
                     cls.pipeline[index][1]=2
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][1]
-                elif((cls.stalled_at_IF and (not isStallAdded))):
-                    cls.pipeline.insert(index,[-1,-1,-1])
+                elif((cls.stalled_at_IF and (not isStallAdded)) and (not cls.harzad)):
+                    cls.pipeline.insert(index,[-1,-1,-9])
                     isStallAdded =True
                     index+=1
             index+=1
         if(not cls.branchTaken) and  (not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad ) and(not cls.stalled_at_ID) and (not cls.stalled_at_IF):
+            print("------------------------------------------$$$$$$$$$$$$$$$$$$$$$$")
             cls.pc+=4
+            print("pc:" , cls.pc)
         # if(cls.branchTaken):
         #     cls.branchTaken = False
         return True
@@ -312,7 +324,7 @@ class Core:
             decoded.append(df2['Instruction'])
             decoded.append(int(instruction[-12:-7],2))
             decoded.append(twos_complement_binary_to_int(instruction[0]+instruction[-20:-12]+instruction[11]+instruction[1:11]+'0'))
-            cls.toBeUsedRegisters=[int(instruction[-12:-7],2),-1,-1]
+            cls.toBeUsedRegisters=[int(instruction[-12:-7],2),-1,-1] 
         return decoded
     
     def EXE(cls,decoded,currPc):
@@ -530,6 +542,7 @@ class Core:
         cls.registers[0]=0
         if(not cls.dataForward):
             cls.registerInUse.pop(0)
+            cls.harzad = False
         return
 
 
