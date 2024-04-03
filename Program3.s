@@ -2,8 +2,14 @@
 .word 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1
 base: .word 0x00000400
 .text
-add x2 x1 x2
-add x3 x2 x4
-add x0 x0 x0
-add x1 x3 x2
-add x0 x0 x0
+addi x1 x0 1
+addi x2 x0 2
+add x3 x0 x0
+loop:
+beq x1 x2 label
+add x3 x1 x3
+addi x1 x1 1
+j loop
+label:
+addi x20 x0 10
+addi x30 x0 11

@@ -217,7 +217,7 @@ class Core:
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==4):
-                if(not cls.stalled_at_WB):
+                if(not cls.stalled_at_WB and not cls.stalled_at_MEM):
                     cls.pipeline[index][1]=5
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][4]
                 elif(cls.stalled_at_MEM and (not isStallAdded)):
@@ -225,9 +225,7 @@ class Core:
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==3):
-                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and cls.stalled_at_EXE:
-                    pass
-                elif(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) :
+                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM and  not cls.stalled_at_EXE) :
                     cls.pipeline[index][1]=4
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][3]
                 elif(cls.stalled_at_EXE and (not isStallAdded)):
@@ -235,7 +233,7 @@ class Core:
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==2):
-                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad):
+                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad) and (not cls.stalled_at_ID):
                     cls.pipeline[index][1]=3
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][2]
                 elif((cls.stalled_at_ID and (not isStallAdded)) and (not cls.harzad)):
@@ -247,7 +245,7 @@ class Core:
                     isStallAdded =True
                     index+=1
             elif(cls.pipeline[index][1]==1):
-                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad ) and(not cls.stalled_at_ID) :
+                if(not cls.stalled_at_WB) and (not cls.stalled_at_MEM) and (not cls.stalled_at_EXE) and (not cls.harzad ) and(not cls.stalled_at_ID) and (not cls.stalled_at_IF):
                     cls.pipeline[index][1]=2
                     cls.pipeline[index][2]=cls.pipelineLatency[cls.pipeline[index][0]][1]
                 elif((cls.stalled_at_IF and (not isStallAdded)) and (not cls.harzad)):
