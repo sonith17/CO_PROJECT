@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from Cache import Cache
 
 def twos_complement_binary_to_int(binary_str):
     if binary_str[0] == '1':
@@ -38,13 +39,15 @@ class Core:
     branchTaken = False
     harzad = False
     dataForward = False
+    cacheAccess = 0
+    cacheMiss = 0
 
 
     @classmethod
     def checkincache(cls,pc):
         return 1
     @classmethod
-    def run(cls,memory,instructionLatencies,end_pc,dataForward):
+    def run(cls,memory,instructionLatencies,end_pc,dataForward,cache:Cache):
         cls.dataForward = dataForward
         if(cls.pipeline or cls.pc<=end_pc):
             if (cls.pc <= end_pc) and (not cls.stalled_at_IF) and (not cls.stalled_at_ID) and (not cls.stalled_at_EXE)and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB) and(not cls.harzad):
@@ -111,6 +114,11 @@ class Core:
 
         for i in cls.pipeline:
             if i[1]==1:
+                cls.cacheAccess+=1
+                if( not cache.search(cls.IF_input)):
+                    print("miss from IF")
+                    i[2] = 2 #cache miss
+                    cls.cacheMiss += 1
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not cls.stalled_at_ID) and(not cls.stalled_at_EXE) and (not cls.stalled_at_MEM)and (not cls.stalled_at_WB) and (not cls.harzad):
@@ -168,6 +176,11 @@ class Core:
                 else:
                     cls.stalled_at_EXE = True
             elif i[1] == 4:
+                if cls.MEM_input[0]=='lw' or cls.MEM_input[0]=='sw':
+                    cls.cacheAccess+=1
+                    if( not cache.search(cls.MEM_input[2])):
+                        i[2] = 2 #cache miss
+                        cls.cacheMiss += 1
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and not cls.stalled_at_WB:
