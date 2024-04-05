@@ -12,42 +12,48 @@ def twos_complement_binary_to_int(binary_str):
 
 
 class Core:
-    pc = 0
-    registers = np.zeros(32, dtype=np.int32)
-    tempRegisters = np.zeros(32, dtype=np.int32)
-    instructionExecuted = 0
-    stalls = 0
-    pipeline = []
-    pipelineLatency = {}
-    IF_input =0
-    ID_input =''
-    EXE_input =[]
-    MEM_input =[]
-    WB_input =[]
-    IF_output =''
-    ID_output =[]
-    EXE_output =[]
-    MEM_output =[]
-    WB_output =[]
-    registerInUse =[]
-    toBeUsedRegisters =[]
-    stalled_at_IF = False
-    stalled_at_ID = False
-    stalled_at_EXE = False
-    stalled_at_MEM = False
-    stalled_at_WB = False
-    branchTaken = False
-    harzad = False
-    dataForward = False
-    cacheAccess = 0
-    cacheMiss = 0
+
+    
+
+    def __init__(self):
+        self.pc = 0
+        self.registers = np.zeros(32, dtype=np.int32)
+        self.tempRegisters = np.zeros(32, dtype=np.int32)
+        self.instructionExecuted = 0
+        self.stalls = 0
+        self.pipeline = []
+        self.pipelineLatency = {}
+        self.IF_input =0
+        self.ID_input =''
+        self.EXE_input =[]
+        self.MEM_input =[]
+        self.WB_input =[]
+        self.IF_output =''
+        self.ID_output =[]
+        self.EXE_output =[]
+        self.MEM_output =[]
+        self.WB_output =[]
+        self.registerInUse =[]
+        self.toBeUsedRegisters =[]
+        self.stalled_at_IF = False
+        self.stalled_at_ID = False
+        self.stalled_at_EXE = False
+        self.stalled_at_MEM = False
+        self.stalled_at_WB = False
+        self.branchTaken = False
+        self.harzad = False
+        self.dataForward = False
+        self.cacheAccess = 0
+        self.cacheMiss = 0
 
 
-    @classmethod
+
+
     def checkincache(self,pc):
         return 1
-    @classmethod
-    def run(self,memory,instructionLatencies,end_pc,dataForward,cache:Cache):
+    
+    def run(self,memory,instructionLatencies,end_pc,dataForward,cache:Cache,memOffset):
+        ID_executed = False
         self.dataForward = dataForward
         if(self.pipeline or self.pc<=end_pc):
             if (self.pc <= end_pc) and (not self.stalled_at_IF) and (not self.stalled_at_ID) and (not self.stalled_at_EXE)and (not self.stalled_at_MEM)and (not self.stalled_at_WB) and(not self.harzad):
@@ -115,26 +121,27 @@ class Core:
         for i in self.pipeline:
             if i[1]==1:
                 self.cacheAccess+=1
-                if( not cache.search(self.IF_input)):
+                if( not cache.search(self.IF_input+memOffset)):
                     print("miss from IF")
                     i[2] = 2 #cache miss
                     self.cacheMiss += 1
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not self.stalled_at_ID) and(not self.stalled_at_EXE) and (not self.stalled_at_MEM)and (not self.stalled_at_WB) and (not self.harzad):
-                    self.IF_output=self.IF(self=self,pc_given=self.IF_input,memory=memory)
+                    self.IF_output=self.IF(pc_given=self.IF_input,memory=memory)
                     self.ID_input=self.IF_output
                     self.stalled_at_IF = False
                 else:
                     self.stalled_at_IF = True    
             elif i[1]==2:
+                ID_executed = True
                 if i[2] != 0:
                     if i[2] > 0:
                         i[2] -= 1
         
                 if (i[2]==0) and (not self.stalled_at_EXE)  and (not self.stalled_at_MEM)and (not self.stalled_at_WB):
                     print("iiiiiiiiiiiiiii")
-                    self.ID_output=self.ID(self,self.ID_input)
+                    self.ID_output=self.ID(self.ID_input)
                     self.pipelineLatency[i[0]]=instructionLatencies[self.ID_output[0]]
                     self.stalled_at_ID = False
                     for ind in range(len(self.registerInUse)):
@@ -167,7 +174,7 @@ class Core:
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not self.stalled_at_MEM)and (not self.stalled_at_WB):
-                    self.EXE_output,nextPc=self.EXE(self,self.EXE_input,i[0])
+                    self.EXE_output,nextPc=self.EXE(self.EXE_input,i[0])
                     if nextPc-i[0]!=4:
                         self.branchTaken=True
                         self.pc = nextPc
@@ -178,13 +185,13 @@ class Core:
             elif i[1] == 4:
                 if self.MEM_input[0]=='lw' or self.MEM_input[0]=='sw':
                     self.cacheAccess+=1
-                    if( not cache.search(self.MEM_input[2])):
+                    if( not cache.search(self.MEM_input[2]+memOffset)):
                         i[2] = 2 #cache miss
                         self.cacheMiss += 1
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and not self.stalled_at_WB:
-                    self.MEM_output=self.MEM(self,self.MEM_input,memory)
+                    self.MEM_output=self.MEM(self.MEM_input,memory)
                     self.WB_input=self.MEM_output
                     self.stalled_at_MEM = False
                 else:
@@ -193,7 +200,7 @@ class Core:
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0:
-                    self.WB(self,self.WB_input)
+                    self.WB(self.WB_input)
                     self.stalled_at_WB = False
                 else:
                     self.stalled_at_WB = True
@@ -210,9 +217,9 @@ class Core:
             self.pipeline.append([-1,-1,-2])
             self.pipeline.append([-1,-1,-3])
             self.EXE_input.clear()
-            if(not self.harzad) and not self.dataForward:
+            if(not self.harzad) and not self.dataForward and ID_executed:
                 self.registerInUse.pop(len(self.registerInUse)-1)
-            if(not self.harzad) and self.dataForward:
+            if(not self.harzad) and self.dataForward and ID_executed:
                 self.registerInUse.pop(len(self.registerInUse)-1)
             self.ID_output.clear()
             self.ID_input=""
