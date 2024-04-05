@@ -10,11 +10,11 @@ class CacheSet:
     Capacity = 0
     policy = 0
 
-    def __init__(self,associativity, policy):
+    
+    def __init__(self, associativity, policy):
         self.associativity = associativity
-        for i in range(0, associativity):
-            self.ageBits.append(i)
-        self.SetBlocks = tuple([CacheBlock()]*associativity)
+        self.ageBits = list(range(associativity))
+        self.SetBlocks = tuple([CacheBlock() for _ in range(associativity)])
         self.Size = 0
         self.Capacity = associativity
         self.policy = policy
@@ -117,6 +117,8 @@ class Cache:
         index:np.uint32
         tag,index = self.splitAddress(address)
         print("address",tag,index,address)
+        with open("processor_state.txt", "a") as file:
+            file.write(f"index,tag is,{index},{tag},{address}\n")
         found = False
         if self.cacheMemory[index].search(tag):
             return True
