@@ -21,6 +21,13 @@ class CacheSet:
     
     def search(self,tag):
         print("searcg being calles")
+        ind =0
+        with open("processor_state.txt", "a") as file:
+            for b in self.SetBlocks:
+                file.write(f"setBlock {ind}  {self.SetBlocks[ind].vaild}  {self.SetBlocks[ind].tag}\n")
+                ind+=1
+            file.close()
+        found = False
         for i in range(0, self.associativity):
             if self.SetBlocks[i].tag == tag and self.SetBlocks[i].vaild :
                 return True
@@ -102,7 +109,7 @@ class Cache:
         self.associativity = associativity
         self.blockSize=blockSize
         self.numBlocks = cacheSize//(blockSize)
-        self.cacheMemory = tuple([CacheSet(associativity,0)]*(self.numBlocks//associativity))
+        self.cacheMemory = tuple([CacheSet(associativity,0) for _ in range(self.numBlocks//associativity)])
         print("Created Sucessfully")
     
     def splitAddress(self,address):
