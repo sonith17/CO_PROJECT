@@ -147,7 +147,7 @@ class Core:
                     for ind in range(len(self.registerInUse)):
                         if ind < len(self.registerInUse):  # Check if ind is within the valid range
                             wr, src1, src2 = self.registerInUse[ind]
-                            if (wr != -1) and (wr in self.toBeUsedRegisters[1:]):
+                            if (wr != -1) and (wr != 0) and (wr in self.toBeUsedRegisters[1:]):
                                 print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
                                 self.harzad = True
                                 break
