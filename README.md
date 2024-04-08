@@ -7,6 +7,89 @@ Welcome to the Read Me file for the development of our RISC-V Dual Core Processo
 
 We are currently engaged in the development of a RISC-V Dual Core Processor. The RISC-V architecture offers an open standard instruction set architecture (ISA), providing flexibility and scalability for various computing needs. This processor design focuses simulation of the RISC-V architecture.
 
+## Minutes of the Meeting(33th Meeting)
+Date: 5th April
+
+Members: Venkat Kaushal,Sonith
+
+Completion:
+
+1. Fixed a few bugs in the files.
+.
+
+Information related to the bugs:
+1. Replaced all cls variables to self variables
+2. The line of code intended to create a SetBlock list with a fixed number was written incorrectly.
+3. Eliminating the detection of data hazards for the register x0. 
+
+## Minutes of the Meeting(32th Meeting)
+Date: 4th April
+
+Members: Venkat Kaushal, Sonith
+
+Completion:
+
+1. Began implementing the cache and completed its implementation.
+.
+
+Information related to the bugs:
+1. Implemented LRU and Random policy
+
+## Minutes of the Meeting(21th Meeting)
+Date: 3rd April
+
+Members: Venkat Kaushal, Sonith
+
+Completion:
+1. Fixed a few bugs in the files.
+.
+
+Information related to the bugs:
+1. To incorporate the appropriate stalls in the right places, we need to add a few missed conditions to the conditional statements.
+
+## Minutes of the Meeting(20th Meeting)
+Date: 2nd April
+
+Members: Venkat Kaushal
+
+Completion:
+1. Began modifying the code to accommodate variable latencies in instructions.
+.
+
+Implementation:
+1. So far, we've been calculating the instruction at the start, storing the output, and providing the output at the final latency stage. Now, we'll switch to evaluating and assigning the output only at the last stage, making the previous stages stalls. 
+2. I meticulously inserted stalls wherever necessary and managed the pipeline movement in the processor.
+3. (*)When an instruction has variable latencies, we reduce those latencies with each cycle, executing the instruction only in the final step when the latency reaches 1.
+
+
+
+## Minutes of the Meeting(19th Meeting)
+Date: 1st April
+
+Members: Sonith, Venkat Kaushal
+
+Completion:
+1. Pipeline with dataForwarding, fixed a few bugs in the files.
+.
+
+## Minutes of the Meeting(18th Meeting)
+Date: 28th March - 31st March
+
+Members: Sonith
+
+Completion:
+1. Processor with pipelining without dataforwarding.
+.
+
+Implementation:
+1. We used to write code in C++, but now we've switched to Python.
+2. The reasons for transitioning to Python as the programming language.
+3. To code a system that stores all the information akin to the Ripes simulator.
+4. We need to finish writing the code quickly.
+
+
+
+
 #### -End of Phase2-----
 ## Minutes of the meeting(17th Meeting)
 Date: 10th March 2024
