@@ -46,42 +46,37 @@ class Core:
         self.cacheAccess = 0
         self.cacheMiss = 0
 
-
-
-
-    def checkincache(self,pc):
-        return 1
     
-    def run(self,memory,instructionLatencies,end_pc,dataForward,cache:Cache,memOffset):
+    def run(self,memory,instructionLatencies,end_pc,dataForward,cache:Cache,memOffset,accesslatencyofCache):
         ID_executed = False
         self.dataForward = dataForward
         if(self.pipeline or self.pc<=end_pc):
             if (self.pc <= end_pc) and (not self.stalled_at_IF) and (not self.stalled_at_ID) and (not self.stalled_at_EXE)and (not self.stalled_at_MEM)and (not self.stalled_at_WB) and(not self.harzad):
-                print("append", end_pc)
-                self.pipeline.append([self.pc,1,self.checkincache(self.pc)])
+                # print("append", end_pc)
+                self.pipeline.append([self.pc,1,1])
                 self.pipelineLatency[self.pc]=[1,1,1,1,1] #will be updated 
                 self.IF_input=self.pc
         else:
             return False
         self.branchTaken=False
-        print(self.pipeline)
-        print(self.registerInUse)
-        print(self.harzad)
-        print(self.stalled_at_IF)
-        print(self.stalled_at_ID)
-        print(self.stalled_at_EXE)
-        print(self.stalled_at_MEM)
-        print(self.stalled_at_WB)
-        print(self.pc)
-        print(self.IF_input)
-        print(self.ID_input)
-        print(self.EXE_input)
-        print(self.MEM_input)
-        print(self.WB_input)
-        print(self.IF_output)
-        print(self.ID_output)
-        print(self.EXE_output)
-        print(self.MEM_output)
+        # print(self.pipeline)
+        # print(self.registerInUse)
+        # print(self.harzad)
+        # print(self.stalled_at_IF)
+        # print(self.stalled_at_ID)
+        # print(self.stalled_at_EXE)
+        # print(self.stalled_at_MEM)
+        # print(self.stalled_at_WB)
+        # print(self.pc)
+        # print(self.IF_input)
+        # print(self.ID_input)
+        # print(self.EXE_input)
+        # print(self.MEM_input)
+        # print(self.WB_input)
+        # print(self.IF_output)
+        # print(self.ID_output)
+        # print(self.EXE_output)
+        # print(self.MEM_output)
         
         with open("processor_state.txt", "a") as file:
             file.write(f"self.pipeline: {self.pipeline}\n")
@@ -114,17 +109,20 @@ class Core:
             file.close()
 
         while(self.pipeline[0][0] == -1):
-            print("This should be taken32365488888888888888888888888888888888885")
+            # print("This should be taken32365488888888888888888888888888888888885")
             self.pipeline.pop(0)
             self.stalls+=1
 
         for i in self.pipeline:
             if i[1]==1:
                 self.cacheAccess+=1
-                if( not cache.search(self.IF_input+memOffset)):
-                    print("miss from IF")
-                    i[2] = 2 #cache miss
+                if(not cache.search(self.IF_input+memOffset)):
+                    # print("miss from IF")
+                    i[2] = accesslatencyofCache+1 #cache miss
                     self.cacheMiss += 1
+                else:
+                    i[2] = accesslatencyofCache
+
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and (not self.stalled_at_ID) and(not self.stalled_at_EXE) and (not self.stalled_at_MEM)and (not self.stalled_at_WB) and (not self.harzad):
@@ -140,7 +138,7 @@ class Core:
                         i[2] -= 1
         
                 if (i[2]==0) and (not self.stalled_at_EXE)  and (not self.stalled_at_MEM)and (not self.stalled_at_WB):
-                    print("iiiiiiiiiiiiiii")
+                    # print("iiiiiiiiiiiiiii")
                     self.ID_output=self.ID(self.ID_input)
                     self.pipelineLatency[i[0]]=instructionLatencies[self.ID_output[0]]
                     self.stalled_at_ID = False
@@ -148,7 +146,7 @@ class Core:
                         if ind < len(self.registerInUse):  # Check if ind is within the valid range
                             wr, src1, src2 = self.registerInUse[ind]
                             if (wr != -1) and (wr != 0) and (wr in self.toBeUsedRegisters[1:]):
-                                print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                                # print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
                                 self.harzad = True
                                 break
                             else:
@@ -186,8 +184,10 @@ class Core:
                 if self.MEM_input[0]=='lw' or self.MEM_input[0]=='sw':
                     self.cacheAccess+=1
                     if( not cache.search(self.MEM_input[2]+memOffset)):
-                        i[2] = 2 #cache miss
+                        i[2] = accesslatencyofCache+1 #cache miss
                         self.cacheMiss += 1
+                    else:
+                        i[2] = accesslatencyofCache
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and not self.stalled_at_WB:
@@ -274,9 +274,9 @@ class Core:
                     index+=1
             index+=1
         if(not self.branchTaken) and  (not self.stalled_at_WB) and (not self.stalled_at_MEM) and (not self.stalled_at_EXE) and (not self.harzad ) and(not self.stalled_at_ID) and (not self.stalled_at_IF):
-            print("------------------------------------------$$$$$$$$$$$$$$$$$$$$$$")
+            # print("------------------------------------------$$$$$$$$$$$$$$$$$$$$$$")
             self.pc+=4
-            print("pc:" , self.pc)
+            # print("pc:" , self.pc)
         # if(self.branchTaken):
         #     self.branchTaken = False
         return True
@@ -308,7 +308,7 @@ class Core:
         for i in range(4):
             instruction = bin(memory[pc_given+i])[2:].zfill(8) +instruction
         
-        print("if ",instruction)
+        # print("if ",instruction)
         return instruction
 
     def ID(self,instruction):
@@ -575,10 +575,10 @@ class Core:
 
 
 
-    def test(self,pc,memory):
-        for i in range(0,pc+1,4):
-            print(self.ID(self.IF(i,memory)))
-        return False
+    # def test(self,pc,memory):
+    #     for i in range(0,pc+1,4):
+    #         print(self.ID(self.IF(i,memory)))
+    #     return False
 
 
 

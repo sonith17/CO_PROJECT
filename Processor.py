@@ -12,10 +12,12 @@ class Processor:
     Core1 = Core()
     Core2 = Core()
     cache:Cache
+    accesslatencyofCache = 1
 
-    def __init__(self,cacheSize,blockSize,associativity):
+    def __init__(self,cacheSize,blockSize,associativity,accesslatencyofCache):
         self.cache = Cache(cacheSize=cacheSize,blockSize=blockSize,associativity=associativity)
-        print("Cache got Created")
+        self.accesslatencyofCache = accesslatencyofCache
+        # print("Cache got Created")
 
 
         
@@ -27,8 +29,8 @@ class Processor:
             with open("processor_state.txt", "a") as file:
               file.write(f"cls.clock: {self.clock}\n")
               file.close()
-            t = self.Core1.run(self.memory1,latencies,end_pc1,dataForward,cache=self.cache,memOffset=0)
-            t1 = self.Core2.run(self.memory2,latencies,end_pc2,dataForward,cache=self.cache,memOffset=2048)
+            t = self.Core1.run(self.memory1,latencies,end_pc1,dataForward,cache=self.cache,memOffset=0,accesslatencyofCache=self.accesslatencyofCache)
+            t1 = self.Core2.run(self.memory2,latencies,end_pc2,dataForward,cache=self.cache,memOffset=2048,accesslatencyofCache=self.accesslatencyofCache)
             if t==0:
                 self.clock1=self.clock
             if t1==0:

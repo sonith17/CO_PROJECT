@@ -20,7 +20,7 @@ class CacheSet:
         self.policy = policy
     
     def search(self,tag):
-        print("searcg being calles")
+        # print("searcg being calles")
         ind =0
         with open("processor_state.txt", "a") as file:
             for b in self.SetBlocks:
@@ -36,7 +36,7 @@ class CacheSet:
     def isFull(self):
         with open("processor_state.txt", "a") as file:
             file.write(f"CAP is,{self.Capacity},{self.Size}\n")
-        print("CAP is",self.Capacity,self.Size)
+        # print("CAP is",self.Capacity,self.Size)
         return self.Size == self.Capacity
     
     def cacheMiss(self, tag):
@@ -84,7 +84,7 @@ class CacheSet:
     def getBlock(self, tag):
         self.SetBlocks[self.Size].tag = tag
         self.SetBlocks[self.Size].vaild = True
-        print("IN GET BLOCK")
+        # print("IN GET BLOCK")
         
 
 class CacheBlock:
@@ -110,7 +110,7 @@ class Cache:
         self.blockSize=blockSize
         self.numBlocks = cacheSize//(blockSize)
         self.cacheMemory = tuple([CacheSet(associativity,0) for _ in range(self.numBlocks//associativity)])
-        print("Created Sucessfully")
+        # print("Created Sucessfully")
     
     def splitAddress(self,address):
         num_bits_offset = int(math.log2(self.blockSize))
@@ -123,7 +123,7 @@ class Cache:
         tag:np.uint32
         index:np.uint32
         tag,index = self.splitAddress(address)
-        print("address",tag,index,address)
+        # print("address",tag,index,address)
         with open("processor_state.txt", "a") as file:
             file.write(f"index,tag is,{index},{tag},{address}\n")
         found = False
