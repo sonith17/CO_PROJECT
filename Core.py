@@ -43,6 +43,8 @@ class Core:
         self.branchTaken = False
         self.harzad = False
         self.dataForward = False
+        self.FirstAtIF = True
+        self.FirstAtMEM = True
         self.cacheAccess = 0
         self.cacheMiss = 0
 
@@ -54,6 +56,7 @@ class Core:
             if (self.pc <= end_pc) and (not self.stalled_at_IF) and (not self.stalled_at_ID) and (not self.stalled_at_EXE)and (not self.stalled_at_MEM)and (not self.stalled_at_WB) and(not self.harzad):
                 # print("append", end_pc)
                 self.pipeline.append([self.pc,1,1])
+                self.FirstAtIF=True
                 self.pipelineLatency[self.pc]=[1,1,1,1,1] #will be updated 
                 self.IF_input=self.pc
         else:
@@ -115,13 +118,15 @@ class Core:
 
         for i in self.pipeline:
             if i[1]==1:
-                self.cacheAccess+=1
-                if(not cache.search(self.IF_input+memOffset)):
-                    # print("miss from IF")
-                    i[2] = accesslatencyofCache+1 #cache miss
-                    self.cacheMiss += 1
-                else:
-                    i[2] = accesslatencyofCache
+                if self.FirstAtIF:
+                    self.cacheAccess+=1
+                    if(not cache.search(self.IF_input+memOffset)):
+                        # print("miss from IF")
+                        i[2] = accesslatencyofCache+1 #cache miss
+                        self.cacheMiss += 1
+                    else:
+                        i[2] = accesslatencyofCache
+                    self.FirstAtIF=False
 
                 if i[2] > 0:
                     i[2] -= 1
@@ -182,12 +187,14 @@ class Core:
                     self.stalled_at_EXE = True
             elif i[1] == 4:
                 if self.MEM_input[0]=='lw' or self.MEM_input[0]=='sw':
-                    self.cacheAccess+=1
-                    if( not cache.search(self.MEM_input[2]+memOffset)):
-                        i[2] = accesslatencyofCache+1 #cache miss
-                        self.cacheMiss += 1
-                    else:
-                        i[2] = accesslatencyofCache
+                    if self.FirstAtMEM:
+                        self.cacheAccess+=1
+                        if( not cache.search(self.MEM_input[2]+memOffset)):
+                            i[2] = accesslatencyofCache+1 #cache miss
+                            self.cacheMiss += 1
+                        else:
+                            i[2] = accesslatencyofCache
+                        self.FirstAtMEM = False
                 if i[2] > 0:
                     i[2] -= 1
                 if i[2]==0 and not self.stalled_at_WB:
@@ -247,6 +254,7 @@ class Core:
             elif(self.pipeline[index][1]==3):
                 if(not self.stalled_at_WB) and (not self.stalled_at_MEM and  not self.stalled_at_EXE) :
                     self.pipeline[index][1]=4
+                    self.FirstAtMEM=True
                     self.pipeline[index][2]=self.pipelineLatency[self.pipeline[index][0]][3]
                 elif(self.stalled_at_EXE and (not isStallAdded)):
                     self.pipeline.insert(index,[-1,-1,-6])

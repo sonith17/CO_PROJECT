@@ -3,12 +3,6 @@ import math
 import random
 
 class CacheSet:
-    associativity = 0
-    ageBits = []
-    SetBlocks = []
-    Size = 0
-    Capacity = 0
-    policy = 0
 
     
     def __init__(self, associativity, policy):
@@ -61,11 +55,11 @@ class CacheSet:
                 self.SetBlocks[i].tag = tag
                 self.SetBlocks[i].vaild = True
                 index = i
-                for i in range(0, self.associativity):
-                    if(i > index):
-                        self.ageBits[i] = self.ageBits[i] - 1
+                for j in range(0, self.associativity):
+                    if(j > index):
+                        self.ageBits[j] = self.ageBits[j] - 1
                     if(i == index):
-                        self.ageBits[i] = self.associativity - 1
+                        self.ageBits[j] = self.associativity - 1
                 return
             
     

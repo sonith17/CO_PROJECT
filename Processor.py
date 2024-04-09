@@ -24,6 +24,7 @@ class Processor:
 
     def run(self,latencies,end_pc1,end_pc2,dataForward):
         t,t1=True,True
+        pr1,pr2 = False,False
         while t1 or t:
             print(self.clock)
             with open("processor_state.txt", "a") as file:
@@ -31,10 +32,12 @@ class Processor:
               file.close()
             t = self.Core1.run(self.memory1,latencies,end_pc1,dataForward,cache=self.cache,memOffset=0,accesslatencyofCache=self.accesslatencyofCache)
             t1 = self.Core2.run(self.memory2,latencies,end_pc2,dataForward,cache=self.cache,memOffset=2048,accesslatencyofCache=self.accesslatencyofCache)
-            if t==0:
+            if t==0 and not pr1:
                 self.clock1=self.clock
-            if t1==0:
+                pr1 = True
+            if t1==0 and not pr2:
                 self.clock2=self.clock
+                pr2 = True
             self.clock+=1
 
     def run1(self,latencies,end_pc1,end_pc2):
