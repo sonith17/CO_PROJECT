@@ -76,7 +76,7 @@ pc2 = p2.parse(memory=(processor.memory2),instruction=instructionsProgram2)
 processor.run(latencies,end_pc1=pc1,end_pc2=pc2,dataForward=dataForward)
 
 
-for x in range(1023,2043,4):
+for x in range(1024,2043,4):
     print(processor.memory1[x]," ",processor.memory1[x+1]," ",processor.memory1[x+2]," ",processor.memory1[x+3],"\n")
 
 print(f"Clocks taken for Core1: {processor.clock1}")
@@ -84,10 +84,10 @@ print(f"Number of instructions executed: {processor.Core1.instructionExecuted}")
 print(f"Number of Cache access: {processor.Core1.cacheAccess}")
 print(f"Number of cache misses: {processor.Core1.cacheMiss}")
 print(f"Miss Rate: {processor.Core1.cacheMiss/processor.Core1.cacheAccess}")
-print(f"Number of Stalls :{processor.Core1.stalls}")
+print(f"Number of Stalls : {processor.Core1.stalls}")
 print(f"IPC: {processor.Core1.instructionExecuted/processor.clock1}")
 
-for x in range(1023,2043,4):
+for x in range(1024,2043,4):
     print(processor.memory2[x]," ",processor.memory2[x+1]," ",processor.memory2[x+2]," ",processor.memory2[x+3],"\n")
 
 print(f"Clocks taken for Core2: {processor.clock2}")
@@ -95,5 +95,5 @@ print(f"Number of instructions executed: {processor.Core2.instructionExecuted}")
 print(f"Number of Cache access: {processor.Core2.cacheAccess}")
 print(f"Number of cache misses: {processor.Core2.cacheMiss}")
 print(f"Miss Rate: {processor.Core2.cacheMiss/processor.Core2.cacheAccess}")
-print(f"Number of Stalls :{processor.Core2.stalls}")
+print(f"Number of Stalls : {processor.Core2.stalls}")
 print(f"IPC: {processor.Core2.instructionExecuted/processor.clock2}")
