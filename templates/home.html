@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #button-container button {
+            margin: 0 10px;
+        }
+
+        .toggle-container {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #4caf50; /* Change to green when toggled on */
+        }
+
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label::after {
+            transform: translateX(30px); /* Move to the right when toggled on */
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .input-wrapper label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-wrapper input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+    <style>
+        /* Add the CSS styles here */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js" integrity="sha512-paKpEk2tmRw49zZf5fVzecmd/ieUs8vMffCgQpmZ6YWn4MGuz+f2DTigc4l6INPlEgrxRwUvWQy9tzW+lhJ07A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+</head>
+<body>
+
+
+    <label for="dataforwarding">Data Forwarding</label>
+    <div class="toggle-container">
+        <input type="checkbox" id="toggle" class="toggle-input">
+        <label for="toggle" class="toggle-label"></label>
+    </div>
+
+    <script>
+        document.getElementById('toggle').addEventListener('change', function() {
+            var isChecked = this.checked;
+            // Send AJAX request to Flask backend to toggle data forwarding
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/toggle_data_forwarding', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Data forwarding toggled successfully');
+                }
+            };
+            xhr.send(JSON.stringify({ isChecked: isChecked }));
+        });
+    </script>
+
+
+
+
+
+    <div id="button-container">
+        <button id="memoryButton" onclick="memory_page()">MEMORY</button>
+        <button id="processorButton" onclick="processor_page()">PROCESSOR</button>
+        <button id="runButton">Run</button>
+    </div>
+
+
+
+
+    <div class="input-container">
+        <div class="input-wrapper">
+            <label for="cacheSize">Cache Size:</label>
+            <input type="text" id="cacheSize" name="cacheSize" pattern="[0-9]*" value="512">
+        </div>
+        <div class="input-wrapper">
+            <label for="blockSize">Block Size:</label>
+            <input type="text" id="blockSize" name="blockSize" pattern="[0-9]*" value="8">
+        </div>
+        <div class="input-wrapper">
+            <label for="associativity">Associativity:</label>
+            <input type="text" id="associativity" name="associativity" pattern="[0-9]*" value="8">
+        </div>
+        <div class="input-wrapper">
+            <label for="accessLatency">Access Latency of Cache:</label>
+            <input type="text" id="accessLatency" name="accessLatency" pattern="[0-9]*" value="1">
+        </div>
+        <button id="data">Confirm Data</button>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="section" id="section1">
+                    {% include 'section1.html' %}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="section" id="section2">
+                    {% include 'section2.html' %}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="section" id="section3">
+                    {% include 'section3.html' %}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="section" id="section4">
+                    {% include 'section4.html' %}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slsection4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script>
+        // Make AJAX request to retrieve register contents
+        fetch('/process_data')
+            .then(response => response.json())
+            .then(data => {
+                // Print Core 1 register contents
+                console.log('Core 1 Registers:');
+                data.core1_registers.forEach(register => {
+                    console.log(`${register.name}: ${register.content}`);
+                });
+
+                // Print Core 2 register contents
+                console.log('Core 2 Registers:');
+                data.core2_registers.forEach(register => {
+                    console.log(`${register.name}: ${register.content}`);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+
+
+    <script>
+
+        // run button 
+        document.getElementById('runButton').addEventListener('click', function() {
+            runFunction(); 
+        });
+    
+        function runFunction() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/run_function', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Function called successfully:', xhr.responseText);
+                }
+            };
+            xhr.send();
+        }
+
+
+        // memory button
+        function memory_page() {
+            window.location.href = 'memory.html';
+        }
+
+
+        // processor button
+        function processor_page() {
+            window.location.href = 'processor.html';
+        }
+
+
+        
+        // submit button in section1
+        document.getElementById('section1Form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            var content = document.getElementById('section1Input').value.trim();
+            if (content.length > 0) {
+                sendDataToServer('/submit_section1', content);
+            }
+        });
+
+        // submit button in section2
+        document.getElementById('section2Form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var content = document.getElementById('section2Input').value.trim();
+            if (content.length > 0) {
+                sendDataToServer('/submit_section2', content);
+            }
+        });
+
+        function sendDataToServer(route, content) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', route, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Submission successful:', xhr.responseText);
+                }
+            };
+            xhr.send(JSON.stringify({ content: content }));
+        }
+
+    
+        document.getElementById('data').addEventListener('click', function() {
+            // Retrieve values from input fields
+            var cacheSize = document.getElementById('cacheSize').value;
+            var blockSize = document.getElementById('blockSize').value;
+            var associativity = document.getElementById('associativity').value;
+            var accessLatency = document.getElementById('accessLatency').value;
+
+            // Construct URL query string
+            var queryString = 'cacheSize=' + cacheSize +
+                            '&blockSize=' + blockSize +
+                            '&associativity=' + associativity +
+                            '&accessLatency=' + accessLatency;
+
+            // Send an AJAX request to the Flask route
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/process_data?' + queryString, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Request was successful, do something if needed
+                    console.log(xhr.responseText);
+                } else {
+                    // Request failed, handle the error
+                    console.error('Error processing data:', xhr.responseText);
+                }
+            };
+            xhr.send();
+        });
+
+</script>
+
+
+
+
+</body>
+</html>

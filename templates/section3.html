@@ -1,0 +1,64 @@
+<!-- section3.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core 1 Registers</title>
+</head>
+<body>
+
+<h2>Core 1 Registers</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Register Name</th>
+            <th>Register Content</th>
+        </tr>
+    </thead>
+    <tbody id="core1_registers_body">
+        <!-- Table rows will be dynamically added here -->
+    </tbody>
+</table>
+
+<script>
+    // Define function to update Core 1 register table
+    
+    function updateCore1RegisterTable(registerData) {
+        // Define register names
+        var registerNames = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16', 'x17', 'x18', 'x19', 'x20', 'x21', 'x22', 'x23', 'x24', 'x25', 'x26', 'x27', 'x28', 'x29', 'x30', 'x31'];
+
+        // Get table body element
+        var tableBody = document.getElementById('core1_registers_body');
+
+        // Clear existing table rows
+        tableBody.innerHTML = '';
+
+        // Iterate over Core 1 register data and populate the table
+        for (var i = 0; i < registerNames.length; i++) {
+            var row = document.createElement('tr');
+            row.innerHTML = `<td>${registerNames[i]}</td><td>${registerData[i]}</td>`;
+            tableBody.appendChild(row);
+        }
+    }
+
+    // Define a function to fetch and update Core 1 register data
+    function refreshCore1RegisterData() {
+        fetch('/process_data')
+            .then(response => response.json())
+            .then(data => {
+                // Call the function to update the Core 1 register table with the latest data
+                updateCore1RegisterTable(data.core1_registers);
+            })
+            .catch(error => console.error('Error fetching Core 1 register data:', error));
+    }
+
+    // Call the function to fetch and update Core 1 register data initially
+    refreshCore1RegisterData();
+
+    // Define an interval to periodically fetch and update Core 1 register data
+    setInterval(refreshCore1RegisterData, 50); // Update every 5 seconds (adjust as needed)
+</script>
+
+</body>
+</html>

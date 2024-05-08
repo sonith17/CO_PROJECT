@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Display</title>
+    <style>
+        /* Ensure the container takes up the entire viewport */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling of the entire page */
+        }
+
+        /* Divide the page into two vertical halves */
+        .split {
+            width: 50%;
+            height: 100%;
+            position: fixed;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Adjust the positioning of the left and right halves */
+        .left {
+            left: 0;
+        }
+
+        .right {
+            right: 0;
+        }
+
+        /* Style the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Style for grouping 4 cells together */
+        .group {
+            display: flex;
+            border: none; /* Remove border for the group */
+        }
+
+        .group div {
+            width: 25%;
+            border-left: 1px solid black; /* Add left border to each cell except the first one */
+            padding: 4px; /* Adjust padding */
+            box-sizing: border-box; /* Include border in cell's width */
+        }
+
+        .group div:first-child {
+            border-left: none; /* Remove left border for the first cell */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Left half for Core 1 memory -->
+<div class="split left">
+    <h2>Core 1 Memory</h2>
+    <table id="core1_memory_table">
+        <thead>
+            <tr>
+                <th>Address</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="core1_memory_body">
+            <!-- Table rows will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Right half for Core 2 memory -->
+<div class="split right">
+    <h2>Core 2 Memory</h2>
+    <table id="core2_memory_table">
+        <thead>
+            <tr>
+                <th>Address</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="core2_memory_body">
+            <!-- Table rows will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- JavaScript to fetch and populate memory data -->
+<script>
+    // Function to fetch and populate memory data
+    function fetchAndPopulateMemoryTable() {
+        fetch('/process_data')
+            .then(response => response.json())
+            .then(data => {
+                // Populate Core 1 memory table
+                var core1MemoryContents = data.memory_contents_1;
+                var core1MemoryTableBody = document.getElementById('core1_memory_body');
+                core1MemoryTableBody.innerHTML = ''; // Clear existing rows
+                for (let i = 0; i < core1MemoryContents.length; i += 4) {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `<td>${i + 1} - ${i + 4}</td>`;
+                    var group = document.createElement('td');
+                    group.className = 'group';
+                    for (let j = 0; j < 4; j++) {
+                        var cell = document.createElement('div');
+                        cell.textContent = core1MemoryContents[i + j];
+                        group.appendChild(cell);
+                    }
+                    row.appendChild(group);
+                    core1MemoryTableBody.appendChild(row);
+                }
+
+                // Populate Core 2 memory table
+                var core2MemoryContents = data.memory_contents_2;
+                var core2MemoryTableBody = document.getElementById('core2_memory_body');
+                core2MemoryTableBody.innerHTML = ''; // Clear existing rows
+                for (let i = 0; i < core2MemoryContents.length; i += 4) {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `<td>${i + 1} - ${i + 4}</td>`;
+                    var group = document.createElement('td');
+                    group.className = 'group';
+                    for (let j = 0; j < 4; j++) {
+                        var cell = document.createElement('div');
+                        cell.textContent = core2MemoryContents[i + j];
+                        group.appendChild(cell);
+                    }
+                    row.appendChild(group);
+                    core2MemoryTableBody.appendChild(row);
+                }
+            })
+            .catch(error => console.error('Error fetching memory data:', error));
+    }
+
+    // Call fetchAndPopulateMemoryTable initially to populate the tables
+    fetchAndPopulateMemoryTable();
+
+    // Set interval to periodically update the memory tables
+    setInterval(fetchAndPopulateMemoryTable, 1000); // Adjust the interval as needed
+</script>
+
+</body>
+</html>

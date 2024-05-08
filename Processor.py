@@ -2,6 +2,8 @@ import array
 import numpy as np
 from Core import Core
 from Cache import Cache
+import pickle
+
 
 class Processor:
     memory1 = np.zeros(2048, dtype=np.uint8)
@@ -40,6 +42,7 @@ class Processor:
                 pr2 = True
             self.clock+=1
 
+
     def run1(self,latencies,end_pc1,end_pc2):
         # t,t1=True,False
         # while t1 or t:
@@ -51,4 +54,6 @@ class Processor:
         # if t1==0:
         #     cls.clock2=cls.clock
         self.clock+=1
+
+
     

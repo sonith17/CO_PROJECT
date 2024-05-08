@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processor</title>
+    <style>
+        /* Set max-width of the image to fit the screen */
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid black; /* Add border around the image */
+            display: block; /* Ensure the image is displayed as a block element */
+            margin: 0 auto; /* Center the image horizontally */
+        }
+
+        /* Style for the title of the image */
+        .image-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Style for the tables */
+        table {
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Title for the page -->
+<h1>Processor</h1>
+
+<!-- Title for the image -->
+<div class="image-title">RISC-V 5 Stage Pipeline</div>
+
+<!-- Displaying image from URL -->
+<img src="https://www.mdpi.com/electronics/electronics-13-00120/article_deploy/html/images/electronics-13-00120-g002.png" alt="Processor Diagram">
+
+<!-- Table for Core 1 information -->
+<table id="core1-table">
+    <caption>Core 1 Information</caption>
+    <tr>
+        <th>Category</th>
+        <th>Value</th>
+    </tr>
+</table>
+
+<!-- Table for Core 2 information -->
+<table id="core2-table">
+    <caption>Core 2 Information</caption>
+    <tr>
+        <th>Category</th>
+        <th>Value</th>
+    </tr>
+</table>
+
+<script>
+    // Function to update the tables with new data
+    function updateTables() {
+        // Make an AJAX request to fetch the updated data from the server
+        fetch('/processor_data')
+            .then(response => response.json())
+            .then(data => {
+                // Update Core 1 table
+                document.getElementById('core1-table').innerHTML = `
+                    <caption>Core 1 Information</caption>
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Clocks taken</td>
+                        <td>${data.Core1.clock1 || 0}</td>
+                    </tr>
+                    <tr>
+                        <td>Number of instructions executed</td>
+                        <td>${data.Core1.instructionExecuted || 0}</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Cache access</td>
+                        <td>${data.Core1.cacheAccess || 0}</td>
+                    </tr>
+                    <tr>
+                        <td>Number of cache misses</td>
+                        <td>${data.Core1.cacheMiss || 0}</td>
+                    </tr>
+                    <tr>
+                        <td>Miss Rate</td>
+                        <td>${(data.Core1.cacheMiss && data.Core1.cacheAccess) ? (data.Core1.cacheMiss / data.Core1.cacheAccess) : 0}</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Stalls</td>
+                        <td>${data.Core1.stalls || 0}</td>
+                    </tr>
+                    <tr>
+                        <td>IPC</td>
+                        <td>${(data.Core1.instructionExecuted && data.Core1.clock1) ? (data.Core1.instructionExecuted / data.Core1.clock1) : 0}</td>
+                    </tr>
+                `;
+
+                // Update Core 2 table (similar to Core 1)
+                document.getElementById('core2-table').innerHTML = `
+                    <caption>Core 2 Information</caption>
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                    </tr>
+                    <!-- Populate Core 2 information here -->
+                `;
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Call the updateTables function initially
+    updateTables();
+
+    // Set interval to update tables every 5 seconds
+    setInterval(updateTables, 5000);
+</script>
+
+</body>
+</html>
