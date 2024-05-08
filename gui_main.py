@@ -15,6 +15,8 @@ latencies = {}
 
 global p
 p = None
+global processor
+processor = None
 
 
 
@@ -46,7 +48,7 @@ def get_data_forwarding():
 #confirm data values
 @app.route('/process_data', methods=['GET'])
 def process_data():
-    print("I am clicked Data")
+    # print("I am clicked Data")
     global p, cacheSize, blockSize, associativity, accessLatency
     global processor
 
@@ -67,11 +69,11 @@ def process_data():
         accessLatency = new_access_latency
 
     # Now you can process the received data as needed, for example, print it
-    print("Cache Size:", cacheSize)
-    print("Block Size:", blockSize)
-    print("Associativity:", associativity)
-    print("Access Latency:", accessLatency)
-    print("DataForward: " , dataForward)
+    # print("Cache Size:", cacheSize)
+    # print("Block Size:", blockSize)
+    # print("Associativity:", associativity)
+    # print("Access Latency:", accessLatency)
+    # print("DataForward: " , dataForward)
    
     #processor = Processor(cacheSize, blockSize, associativity, accessLatency)
     if processor is not None:
@@ -83,8 +85,9 @@ def process_data():
     
 
     # Optionally, you can return a response to the client
-    return jsonify({"core1_registers": core1_registers, "core2_registers": core2_registers, "memory_contents_1": memory_contents_1,
-                    "memory_contents_2": memory_contents_2})
+        return jsonify({"core1_registers": core1_registers, "core2_registers": core2_registers, "memory_contents_1": memory_contents_1,
+                        "memory_contents_2": memory_contents_2})
+    return 'Processor is None'
 
 
 @app.route('/update_instructions', methods=['POST'])
@@ -177,16 +180,17 @@ def processor1():
             'cacheAccess': p.Core1.cacheAccess,
             'cacheMiss': p.Core1.cacheMiss,
             'stalls': p.Core1.stalls,
-            'IPC': (p.Core1.instructionExecuted/p.clock1)
+            'IPC': p.Core1.instructionExecuted / p.clock1 if p.clock1 != 0 else 0
         },
         'Core2': {
             'instructionExecuted': p.Core2.instructionExecuted,
             'cacheAccess': p.Core2.cacheAccess,
             'cacheMiss': p.Core2.cacheMiss,
             'stalls': p.Core2.stalls,
-            'IPC': (p.Core2.instructionExecuted/p.clock2)
+            'IPC': p.Core2.instructionExecuted / p.clock1 if p.clock1 != 0 else 0
         }
     }
+    
     return render_template('processor.html', processor=processor_data)
 
 
