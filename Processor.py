@@ -6,19 +6,18 @@ import pickle
 
 
 class Processor:
-    memory1 = np.zeros(2048, dtype=np.uint8)
-    memory2 = np.zeros(2048, dtype=np.uint8)
-    clock = 0
-    clock1 = 0
-    clock2 = 0
-    Core1 = Core()
-    Core2 = Core()
-    cache:Cache
-    accesslatencyofCache = 1
 
+    
     def __init__(self,cacheSize,blockSize,associativity,accesslatencyofCache):
         self.cache = Cache(cacheSize=cacheSize,blockSize=blockSize,associativity=associativity)
         self.accesslatencyofCache = accesslatencyofCache
+        self.memory1 = np.zeros(2048, dtype=np.uint8)
+        self.memory2 = np.zeros(2048, dtype=np.uint8)
+        self.clock = 0
+        self.clock1 = 0
+        self.clock2 = 0
+        self.Core1 = Core()
+        self.Core2 = Core()
         # print("Cache got Created")
 
 

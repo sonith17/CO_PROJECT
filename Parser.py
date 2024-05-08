@@ -27,7 +27,6 @@ class Parser:
     labels = {}
 
 
-    @classmethod
     def prerun(self,instructions):
         offset =0
         i = 0
@@ -59,7 +58,6 @@ class Parser:
         return instruction
 
 
-    @classmethod
     def parse(self,memory,instruction):
         df = pd.read_csv('Instruction.csv')
         # print(df)

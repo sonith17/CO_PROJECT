@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import pickle
+from Parser import Parser
+from Processor import Processor
 
 app = Flask(__name__)
 
@@ -10,8 +12,7 @@ associativity = 8
 accessLatency = 1
 
 latencies = {}
-instructionsProgram1 = []
-instructionsProgram2 = []
+
 global p
 p = None
 
@@ -50,6 +51,7 @@ def get_data_forwarding():
 def process_data():
     print("I am clicked Data")
     global p, cacheSize, blockSize, associativity, accessLatency
+    global processor
 
     # Retrieve values from request query parameters and convert them to integers
     new_cache_size = int(request.args.get('cacheSize', default=cacheSize))
@@ -73,15 +75,15 @@ def process_data():
     print("Associativity:", associativity)
     print("Access Latency:", accessLatency)
     print("DataForward: " , dataForward)
-
-    from Processor import Processor
-    global processor
-    processor = Processor(cacheSize, blockSize, associativity, accessLatency)
-    p = processor
-    core1_registers = processor.Core1.registers.tolist()
-    core2_registers = processor.Core2.registers.tolist()
-    memory_contents_1 = processor.memory1.tolist()
-    memory_contents_2 = processor.memory2.tolist()
+    print("process",processor)
+   
+    #processor = Processor(cacheSize, blockSize, associativity, accessLatency)
+    if processor is not None:
+        p = processor
+        core1_registers = processor.Core1.registers.tolist()
+        core2_registers = processor.Core2.registers.tolist()
+        memory_contents_1 = processor.memory1.tolist()
+        memory_contents_2 = processor.memory2.tolist()
     
 
     # Optionally, you can return a response to the client
@@ -142,7 +144,11 @@ def processor1():
 @app.route('/run_function')
 def run_function():
     global cacheSize, blockSize, associativity, accessLatency, dataForward
-    global processor
+    global processor,p
+    processor = Processor(cacheSize, blockSize, associativity, accessLatency)
+    p=processor
+    instructionsProgram1 = []
+    instructionsProgram2 = []
     with open('Program1.s', 'r') as file:
         for line in file:
             if line.strip() != '':
@@ -151,7 +157,7 @@ def run_function():
                 instructionsProgram1.append(line)
 
     print(instructionsProgram1)
-    from Parser import Parser
+    
     p1 = Parser()
     pc1 = p1.parse(memory=(processor.memory1), instruction=instructionsProgram1)
     with open('Program2.s', 'r') as file:
