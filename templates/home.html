@@ -165,6 +165,171 @@
         <button id="data">Confirm Data</button>
     </div>
     
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Instruction Table -->
+                <div class="container">
+                    <h2>R-Type Instructions</h2>
+                    <table id="instruction-table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Instruction Type</th>
+                                <th colspan="5">User Input</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="add"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="sub"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="or"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="and"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="xor"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="slt"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="srl"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="sll"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <!-- Add more rows for other instruction types -->
+                        </tbody>
+                    </table>
+                    <button id="updateButton" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="container">
+                    <h2>I-Type Instructions</h2>
+                    <table id="instruction-table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Instruction Type</th>
+                                <th colspan="5">User Input</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="addi"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="ori"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="andi"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="xori"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="slti"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="srli"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="instruction-type" value="slli"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                                <td><input type="number" class="user-input" min="1" value="1" style="width: 50px;"></td>
+                            </tr>
+                            <!-- Add more rows for other instruction types -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3">
@@ -308,9 +473,36 @@
             xhr.send();
         });
 
+
+        document.getElementById('updateButton').addEventListener('click', function() {
+            var instructionData = [];
+
+            // Iterate through table rows
+            $('#instruction-table tbody tr').each(function() {
+                var instructionType = $(this).find('.instruction-type').val();
+                var userInputs = [];
+                $(this).find('.user-input').each(function() {
+                    userInputs.push(parseInt($(this).val()));
+                });
+                instructionData.push({type: instructionType, inputs: userInputs});
+            });
+
+            // Send instruction data to Flask backend using AJAX
+            $.ajax({
+                url: '/update_instructions',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({instructions: instructionData}),
+                success: function(response) {
+                    console.log('Instructions updated successfully:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating instructions:', error);
+                }
+            });
+        });
+
 </script>
-
-
 
 
 </body>
