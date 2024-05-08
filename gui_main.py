@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import pickle
 from Parser import Parser
 from Processor import Processor
@@ -10,16 +10,13 @@ cacheSize = 512
 blockSize = 8
 associativity = 8
 accessLatency = 1
-
+global latencies
 latencies = {}
 
 global p
 p = None
 
-instruct = ["add", "sub", "or", "and", "xor", "slt", "srl", "sll", "addi", "subi", "ori", "andi", "xori", "slti",
-            "srli", "slli", "jalr", "lw", "sw", "beq", "bne", "blt", "bge", "auipc", "jal"]
-for x in instruct:
-    latencies[x] = [1, 1, 1, 1, 1]
+
 
 #opening route
 @app.route("/")
@@ -75,7 +72,6 @@ def process_data():
     print("Associativity:", associativity)
     print("Access Latency:", accessLatency)
     print("DataForward: " , dataForward)
-    print("process",processor)
    
     #processor = Processor(cacheSize, blockSize, associativity, accessLatency)
     if processor is not None:
@@ -89,6 +85,58 @@ def process_data():
     # Optionally, you can return a response to the client
     return jsonify({"core1_registers": core1_registers, "core2_registers": core2_registers, "memory_contents_1": memory_contents_1,
                     "memory_contents_2": memory_contents_2})
+
+
+@app.route('/update_instructions', methods=['POST'])
+def update_instructions():
+    data = request.json
+    instructions = data.get('instructions')
+    process_instructions(instructions)
+    return jsonify({'message': 'Instructions received and processed successfully'})
+
+def process_instructions(instructions):
+    global latencies
+    latencies = {
+        "add": [1, 1, 1, 1, 1],
+        "sub": [1, 1, 1, 1, 1],
+        "or": [1, 1, 1, 1, 1],
+        "and": [1, 1, 1, 1, 1],
+        "xor": [1, 1, 1, 1, 1],
+        "slt": [1, 1, 1, 1, 1],
+        "srl": [1, 1, 1, 1, 1],
+        "sll": [1, 1, 1, 1, 1],
+        "addi": [1, 1, 1, 1, 1],
+        "subi": [1, 1, 1, 1, 1],
+        "ori": [1, 1, 1, 1, 1],
+        "andi": [1, 1, 1, 1, 1],
+        "xori": [1, 1, 1, 1, 1],
+        "slti": [1, 1, 1, 1, 1],
+        "srli": [1, 1, 1, 1, 1],
+        "slli": [1, 1, 1, 1, 1],
+        "jalr": [1, 1, 1, 1, 1],
+        "lw": [1, 1, 1, 1, 1],
+        "sw": [1, 1, 1, 1, 1],
+        "beq": [1, 1, 1, 1, 1],
+        "bne": [1, 1, 1, 1, 1],
+        "blt": [1, 1, 1, 1, 1],
+        "bge": [1, 1, 1, 1, 1],
+        "auipc": [1, 1, 1, 1, 1],
+        "jal": [1, 1, 1, 1, 1]
+    }
+    
+    for instruction in instructions:
+        instruct_type = instruction['type']
+        user_inputs = instruction['inputs']
+        
+        # Check if the instruction type is valid
+        if instruct_type in latencies:
+            # Update the latency values with user inputs
+            latencies[instruct_type] = user_inputs
+        else:
+            print(f"Invalid instruction type: {instruct_type}")
+    
+    # Print or return the updated latencies
+    print("Updated instruction latencies:", latencies)
 
 
 
@@ -123,17 +171,20 @@ def processor1():
         return "Processor object is not initialized. Please run the run_function first."
     processor_data = {
         'clock1': p.clock1,
+        'clock2': p.clock2,
         'Core1': {
             'instructionExecuted': p.Core1.instructionExecuted,
             'cacheAccess': p.Core1.cacheAccess,
             'cacheMiss': p.Core1.cacheMiss,
-            'stalls': p.Core1.stalls
+            'stalls': p.Core1.stalls,
+            'IPC': (p.Core1.instructionExecuted/p.clock1)
         },
         'Core2': {
             'instructionExecuted': p.Core2.instructionExecuted,
             'cacheAccess': p.Core2.cacheAccess,
             'cacheMiss': p.Core2.cacheMiss,
-            'stalls': p.Core2.stalls
+            'stalls': p.Core2.stalls,
+            'IPC': (p.Core2.instructionExecuted/p.clock2)
         }
     }
     return render_template('processor.html', processor=processor_data)
@@ -144,7 +195,7 @@ def processor1():
 @app.route('/run_function')
 def run_function():
     global cacheSize, blockSize, associativity, accessLatency, dataForward
-    global processor,p
+    global processor,p, latencies
     processor = Processor(cacheSize, blockSize, associativity, accessLatency)
     p=processor
     instructionsProgram1 = []
@@ -170,7 +221,7 @@ def run_function():
     pc2 = p2.parse(memory=(processor.memory2), instruction=instructionsProgram2)
     processor.run(latencies, end_pc1=pc1, end_pc2=pc2, dataForward=dataForward)
 
-    return 'Function called successfully.'
+    return redirect(url_for('processor1'))
 
 
 
