@@ -8,8 +8,8 @@ import pickle
 class Processor:
 
     
-    def __init__(self,cacheSize,blockSize,associativity,accesslatencyofCache):
-        self.cache = Cache(cacheSize=cacheSize,blockSize=blockSize,associativity=associativity)
+    def __init__(self,cacheSize,blockSize,associativity,accesslatencyofCache,ReplacementPolicy):
+        self.cache = Cache(cacheSize=cacheSize,blockSize=blockSize,associativity=associativity,ReplacementPolicy=ReplacementPolicy)
         self.accesslatencyofCache = accesslatencyofCache
         self.memory1 = np.zeros(2048, dtype=np.uint8)
         self.memory2 = np.zeros(2048, dtype=np.uint8)
@@ -18,6 +18,8 @@ class Processor:
         self.clock2 = 0
         self.Core1 = Core()
         self.Core2 = Core()
+        with open("processor_state.txt", "w") as file:
+            file.close()
         # print("Cache got Created")
 
 

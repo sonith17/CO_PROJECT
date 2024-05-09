@@ -163,6 +163,21 @@
             <label for="accessLatency">Access Latency of Cache:</label>
             <input type="text" id="accessLatency" name="accessLatency" pattern="[0-9]*" value="1">
         </div>
+        <div>
+            <fieldset>
+                <legend>Choose Cache Replacement policy</legend>
+              
+                <div>
+                  <input type="checkbox" id="LRU" name="LRU"  />
+                  <label for="LRU">LRU</label>
+                </div>
+              
+                <div>
+                  <input type="checkbox" id="Random" name="Random" />
+                  <label for="Random">Random</label>
+                </div>
+              </fieldset>
+        </div>
         <button id="data">Confirm Data</button>
     </div>
     
@@ -453,12 +468,21 @@
             var blockSize = document.getElementById('blockSize').value;
             var associativity = document.getElementById('associativity').value;
             var accessLatency = document.getElementById('accessLatency').value;
-
+            var policy = 0
+            if($( "input[type=checkbox][name=Random]:checked" ).val()=='on')
+            {
+                policy=1;
+            }
+            else if($( "input[type=checkbox][name=LRU]:checked" ).val()=='on')
+            {
+                policy=0;
+            }
             // Construct URL query string
             var queryString = 'cacheSize=' + cacheSize +
                             '&blockSize=' + blockSize +
                             '&associativity=' + associativity +
-                            '&accessLatency=' + accessLatency;
+                            '&accessLatency=' + accessLatency +
+                            '&policy='+policy;
 
             // Send an AJAX request to the Flask route
             var xhr = new XMLHttpRequest();

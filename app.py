@@ -11,6 +11,8 @@ cacheSize = 512
 blockSize = 8
 associativity = 8
 accessLatency = 1
+global policy
+policy = 0
 global latencies
 latencies = {}
 
@@ -52,12 +54,15 @@ def process_data():
     # print("I am clicked Data")
     global p, cacheSize, blockSize, associativity, accessLatency
     global processor
-
+    global policy
+    print("Policy1: " , policy)
     # Retrieve values from request query parameters and convert them to integers
     new_cache_size = int(request.args.get('cacheSize', default=cacheSize))
     new_block_size = int(request.args.get('blockSize', default=blockSize))
     new_associativity = int(request.args.get('associativity', default=associativity))
     new_access_latency = int(request.args.get('accessLatency', default=accessLatency))
+    new_policy=int(request.args.get('policy', default=policy))
+        
 
     # Update the global variables only if new values are provided
     if new_cache_size != cacheSize:
@@ -68,6 +73,8 @@ def process_data():
         associativity = new_associativity
     if new_access_latency != accessLatency:
         accessLatency = new_access_latency
+    if new_policy != policy:
+        policy = new_policy
 
     # Now you can process the received data as needed, for example, print it
     # print("Cache Size:", cacheSize)
@@ -75,7 +82,7 @@ def process_data():
     # print("Associativity:", associativity)
     # print("Access Latency:", accessLatency)
     # print("DataForward: " , dataForward)
-   
+    print("policy " , policy)
     #processor = Processor(cacheSize, blockSize, associativity, accessLatency)
     if processor is not None:
         p = processor
@@ -171,17 +178,25 @@ def memory():
 @app.route("/cache.html")
 def cache():
     global processor, blockSize, cacheSize, associativity
-    cache_contents = list(processor.cache.cacheMemory)
+    cache_contents = list(processor.cache.cacheMemory) if processor is not None else None
+
+    started = True if cache_contents is not None else False
 
     # Extract all tags from cache memory
     all_tags = []
-    for cache_set in cache_contents:
-        for cache_block in cache_set.SetBlocks:
-            all_tags.extend([cache_block.tag])
-    cache_size = len(all_tags)
+    if cache_contents is not None:
+        for cache_set in cache_contents:
+            for cache_block in cache_set.SetBlocks:
+                all_tags.extend([cache_block.tag])
+        cache_size = len(all_tags)
+
+    if not started:
+         return render_template('cache.html',started=started, all_tags= all_tags, cache_size= cacheSize, blockSize=blockSize, associativity = associativity)
+
+
     
 
-    return render_template('cache.html', all_tags= all_tags, cache_size= cacheSize, cacheMemory= processor.cache.cacheMemory, blockSize=blockSize, associativity = associativity)
+    return render_template('cache.html',started=started, all_tags= all_tags, cache_size= cacheSize, cacheMemory= processor.cache.cacheMemory, blockSize=blockSize, associativity = associativity)
 
 #processor webpage
 @app.route("/processor.html")
@@ -215,10 +230,11 @@ def processor1():
 #when run button is clicked it run the program
 @app.route('/run_function')
 def run_function():
-    global cacheSize, blockSize, associativity, accessLatency, dataForward
+    global cacheSize, blockSize, associativity, accessLatency, dataForward, policy
     global processor,p, latencies
-    processor = Processor(cacheSize, blockSize, associativity, accessLatency)
+    processor = Processor(cacheSize, blockSize, associativity, accessLatency,policy)
     p=processor
+    print(policy,"nu uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
     instructionsProgram1 = []
     instructionsProgram2 = []
     with open('Program1.s', 'r') as file:

@@ -36,6 +36,12 @@
         .set-block-4 {
             background-color: #90EE90; /* Light green */
         }
+        .valid{
+            background-color: mediumvioletred;
+        }
+        .notvalid{
+            background-color: aliceblue;
+        }
         /* CSS for the last paragraph */
         p.last-paragraph {
             text-align: center; /* Center align the paragraph */
@@ -66,6 +72,7 @@
 
 <!-- Create a big table with two columns -->
 <table>
+    {% if started %}
     <tbody>
         {% for cache_set in cacheMemory %}
         <tr>
@@ -93,7 +100,11 @@
                         <tr>
                             {% for cache_block in cache_set.SetBlocks %}
                             {% if loop.index0 < blockSize %}
-                            <td class="set-block set-block-{{ cache_block.tag % cache_set.associativity + 1 }}">{{ cache_block.tag }}</td>
+                            {% if cache_block.vaild %}
+                            <td class="set-block valid">{{ cache_block.tag }}</td>
+                            {% else %}
+                            <td class="set-block notvalid">{{ cache_block.tag }}</td>
+                            {% endif %}
                             {% endif %}
                             {% endfor %}
                             {% if cache_set.associativity > blockSize %}
@@ -109,6 +120,9 @@
         </tr>
         {% endfor %}
     </tbody>
+    {% else%}
+    <p>Processor not intialized</p>
+    {% endif %}
 </table>
 
 <!-- Last paragraph -->

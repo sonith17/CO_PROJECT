@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import random
+import time
 
 class CacheSet:
 
@@ -64,6 +65,9 @@ class CacheSet:
             
     
     def Random(self, tag):
+        current_time = int(time.time())
+        random.seed(current_time)
+
         index = random.randrange(self.associativity)
         for i in range(0, self.associativity):
             if(i > index):
@@ -98,12 +102,12 @@ class Cache:
     numBlocks = 0
     
 
-    def __init__(self,cacheSize,blockSize,associativity):
+    def __init__(self,cacheSize,blockSize,associativity,ReplacementPolicy):
         self.cacheSize = cacheSize
         self.associativity = associativity
         self.blockSize=blockSize
         self.numBlocks = cacheSize//(blockSize)
-        self.cacheMemory = tuple([CacheSet(associativity,0) for _ in range(self.numBlocks//associativity)])
+        self.cacheMemory = tuple([CacheSet(associativity,ReplacementPolicy) for _ in range(self.numBlocks//associativity)])
         # print("Created Sucessfully")
     
     def splitAddress(self,address):
