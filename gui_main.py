@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 import pickle
 from Parser import Parser
 from Processor import Processor
+import math
 
 app = Flask(__name__)
 
@@ -166,6 +167,22 @@ def submit_section2():
 def memory():
     return render_template('memory.html')
 
+#cache webpage
+@app.route("/cache.html")
+def cache():
+    global processor, blockSize, cacheSize, associativity
+    cache_contents = list(processor.cache.cacheMemory)
+
+    # Extract all tags from cache memory
+    all_tags = []
+    for cache_set in cache_contents:
+        for cache_block in cache_set.SetBlocks:
+            all_tags.extend([cache_block.tag])
+    cache_size = len(all_tags)
+    
+
+    return render_template('cache.html', all_tags= all_tags, cache_size= cacheSize, cacheMemory= processor.cache.cacheMemory, blockSize=blockSize, associativity = associativity)
+
 #processor webpage
 @app.route("/processor.html")
 def processor1():
@@ -226,7 +243,6 @@ def run_function():
     processor.run(latencies, end_pc1=pc1, end_pc2=pc2, dataForward=dataForward)
 
     return redirect(url_for('processor1'))
-
 
 
 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cache</title>
+    <h1>Cache</h1>
+    <style>
+        /* CSS to style the table */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* CSS to distinguish blocks based on associativity */
+        .set-block {
+            padding: 10px;
+            border: 1px solid black;
+        }
+        /* Define different colors for different associativity levels */
+        .set-block-1 {
+            background-color: #FFC0CB; /* Light pink */
+        }
+        .set-block-2 {
+            background-color: #ADD8E6; /* Light blue */
+        }
+        .set-block-4 {
+            background-color: #90EE90; /* Light green */
+        }
+        /* CSS for the last paragraph */
+        p.last-paragraph {
+            text-align: center; /* Center align the paragraph */
+            font-weight: bold; /* Bold text */
+            font-size: smaller; /* Smaller font size */
+        }
+        /* CSS for the Home link */
+        a.home-link {
+            display: inline-block; /* Display as a block element */
+            padding: 10px 20px; /* Add padding */
+            background-color: #4CAF50; /* Green background color */
+            color: white; /* White text color */
+            text-decoration: none; /* Remove underline */
+            border-radius: 5px; /* Add border radius */
+            transition: background-color 0.3s; /* Add transition effect for background color */
+        }
+        /* CSS for the Home link hover effect */
+        a.home-link:hover {
+            background-color: #45a049; /* Darker green background color on hover */
+        }
+    </style>
+    <meta http-equiv="refresh" content="5"> <!-- Refresh the page every 5 seconds -->
+</head>
+<body>
+
+<!-- Home link -->
+<a class="home-link" href="/home">Home</a>
+
+<!-- Create a big table with two columns -->
+<table>
+    <tbody>
+        {% for cache_set in cacheMemory %}
+        <tr>
+            <!-- First column: Set numbering -->
+            <td>
+                <p style="font-weight: bold;">Set {{ loop.index }}</p>
+            </td>
+            <!-- Second column: Display the table for the current set -->
+            <td>
+                <table>
+                    <tbody>
+                        <!-- First row: Block numbering -->
+                        <tr>
+                            {% for col in range(1, cache_set.associativity + 1) %}
+                            <th>Block {{ col }}</th>
+                            {% endfor %}
+                            {% if cache_set.associativity > blockSize %}
+                            <!-- Fill the empty slot with additional block numbers -->
+                            {% for col in range(cache_set.associativity - blockSize) %}
+                            <th></th>
+                            {% endfor %}
+                            {% endif %}
+                        </tr>
+                        <!-- Second row: Iterate through tags and insert one by one -->
+                        <tr>
+                            {% for cache_block in cache_set.SetBlocks %}
+                            {% if loop.index0 < blockSize %}
+                            <td class="set-block set-block-{{ cache_block.tag % cache_set.associativity + 1 }}">{{ cache_block.tag }}</td>
+                            {% endif %}
+                            {% endfor %}
+                            {% if cache_set.associativity > blockSize %}
+                            <!-- Fill the empty slot with additional block tags -->
+                            {% for col in range(cache_set.associativity - blockSize) %}
+                            <td></td>
+                            {% endfor %}
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Last paragraph -->
+<p class="last-paragraph">The values shown are not physical address, those are the tag of the address.<br>If contents are not updated, please refresh the page.</p>
+
+</body>
+</html>

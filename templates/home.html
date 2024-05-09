@@ -139,6 +139,7 @@
     <div id="button-container">
         <button id="memoryButton" onclick="memory_page()">MEMORY</button>
         <button id="processorButton" onclick="processor_page()">PROCESSOR</button>
+        <button id="cacheButton" onclick= "cache_page()">CACHE</button>
         <button id="runButton">Run</button>
     </div>
 
@@ -383,7 +384,6 @@
 
 
     <script>
-
         // run button 
         document.getElementById('runButton').addEventListener('click', function() {
             runFunction(); 
@@ -412,7 +412,9 @@
             window.location.href = 'processor.html';
         }
 
-
+        function cache_page() {
+            window.location.href = 'cache.html';
+        }
         
         // submit button in section1
         document.getElementById('section1Form').addEventListener('submit', function(event) {

@@ -32,11 +32,36 @@
             border: 2px solid black;
             margin-bottom: 20px;
         }
+        /* Style for the home button */
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .home-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .home-link a:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
 
+
+
 <h1>Processor Information</h1>
+
+<!-- Home button -->
+<div class="home-link">
+    <a href="/home">Home</a>
+</div>
 
 <!-- Inserting the image above the table -->
 <img src="https://www.mdpi.com/electronics/electronics-13-00120/article_deploy/html/images/electronics-13-00120-g002.png" alt="Processor Diagram">

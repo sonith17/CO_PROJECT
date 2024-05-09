@@ -62,10 +62,26 @@
         .group div:first-child {
             border-left: none; /* Remove left border for the first cell */
         }
+        /* CSS for the Home link */
+        a.home-link {
+            display: inline-block; /* Display as a block element */
+            padding: 10px 20px; /* Add padding */
+            background-color: #4CAF50; /* Green background color */
+            color: white; /* White text color */
+            text-decoration: none; /* Remove underline */
+            border-radius: 5px; /* Add border radius */
+            transition: background-color 0.3s; /* Add transition effect for background color */
+        }
+        /* CSS for the Home link hover effect */
+        a.home-link:hover {
+            background-color: #45a049; /* Darker green background color on hover */
+        }
     </style>
 </head>
 <body>
-    <a href="/home"><button>Go to Home</button></a>
+<!-- Home link -->
+<a class="home-link" href="/home">Home</a>  
+
 <!-- Left half for Core 1 memory -->
 <div class="split left">
     <h2>Core 1 Memory</h2>
