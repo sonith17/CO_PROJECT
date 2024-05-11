@@ -7,6 +7,59 @@ Welcome to the Read Me file for the development of our RISC-V Dual Core Processo
 
 We are currently engaged in the development of a RISC-V Dual Core Processor. The RISC-V architecture offers an open standard instruction set architecture (ISA), providing flexibility and scalability for various computing needs. This processor design focuses simulation of the RISC-V architecture.
 
+
+#### -End of Phase4-----
+## Minutes of the Meeting(27th Meeting)
+Date: 9th May
+
+Members: Venkat Kaushal,Sonith
+
+Completion:
+
+1. Completed Cache
+2. fixed some bugs - Checkbox for LRU & Random, color coding
+3. Ready for deployment
+.
+
+## Minutes of the Meeting(26th Meeting)
+Date: 8th May
+
+Members: Venkat Kaushal,Sonith
+
+Completion:
+
+1. Bug description - Cannot run multiple times, and fixing the bug
+2. Creating space for Variable Latencies, and Processor webpage
+3. We contemplated the cache design and initiated its implementation.
+.
+
+
+## Minutes of the Meeting(25th Meeting)
+Date: 7th May
+
+Members: Venkat Kaushal,Sonith
+
+Completion:
+
+1. Established the primary HTML structure framework
+2. Register Display and Register Updation
+3. Memory Display and Memory Updation.
+.
+
+
+## Minutes of the Meeting(24th Meeting)
+Date: 6th May
+
+Members: Venkat Kaushal,Sonith
+
+Completion:
+
+1. We discussed what should be implemented and how we plan to execute it.
+2. We've opted to develop a GUI for the project and selected Flask as our framework of choice.
+.
+
+
+#### -End of Phase3-----
 ## Minutes of the Meeting(23th Meeting)
 Date: 5th April
 
