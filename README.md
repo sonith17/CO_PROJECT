@@ -7,6 +7,9 @@ Welcome to the Read Me file for the development of our RISC-V Dual Core Processo
 
 We are currently engaged in the development of a RISC-V Dual Core Processor. The RISC-V architecture offers an open standard instruction set architecture (ISA), providing flexibility and scalability for various computing needs. This processor design focuses simulation of the RISC-V architecture.
 
+## GUI
+ Link for WEB based GUI
+ [Web based GUI](https://multiple-evanne-noth-f577d1a4.koyeb.app/)
 
 #### -End of Phase4-----
 ## Minutes of the Meeting(27th Meeting)
